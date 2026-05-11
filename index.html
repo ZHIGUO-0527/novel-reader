@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>云中书阁 - 小说阅读</title>
+<style>
+:root {
+  --bg: #f5f0e8; --bg2: #ede4d3; --text: #3d3226; --text2: #6b5d4f;
+  --accent: #8b5e3c; --accent2: #c4956a; --card: #fffaf2; --cardBorder: #e0d5c0;
+  --sidebar: #faf6ef; --divider: #e0d5c0; --hover: #f0e8d8;
+  --shadow: rgba(0,0,0,0.06); --selection: #d4c4a8; --star: #f0c040;
+}
+:root[data-theme="dark"] {
+  --bg: #1a1a1e; --bg2: #222228; --text: #d0d0d0; --text2: #999;
+  --accent: #c4956a; --accent2: #d4a87c; --card: #252530; --cardBorder: #333;
+  --sidebar: #1e1e24; --divider: #333; --hover: #2a2a35;
+  --shadow: rgba(0,0,0,0.3); --selection: #4a4030; --star: #e0b830;
+}
+:root[data-theme="eye"] {
+  --bg: #e8f0e0; --bg2: #d8e8ce; --text: #3a4a32; --text2: #5a6a52;
+  --accent: #6b8a5e; --accent2: #7a9a6e; --card: #f0f6ec; --cardBorder: #c8d8be;
+  --sidebar: #eaf4e4; --divider: #c8d8be; --hover: #dce8d4;
+  --shadow: rgba(0,0,0,0.04); --selection: #c0d4b0; --star: #d4a030;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font-family: 'STSong','Songti SC','SimSun','KaiTi',serif; min-height: 100vh; transition: background 0.3s, color 0.3s; }
+::selection { background: var(--selection); }
+
+/* ====== Topbar ====== */
+#topbar { position: sticky; top: 0; z-index: 100; background: var(--bg2); border-bottom: 1px solid var(--divider); padding: 0 20px; display: flex; align-items: center; height: 52px; gap: 10px; backdrop-filter: blur(8px); }
+#topbar .logo { font-size: 20px; font-weight: bold; color: var(--accent); cursor: pointer; letter-spacing: 2px; white-space: nowrap; }
+.search-wrap { flex: 1; max-width: 280px; position: relative; }
+.search-wrap input { width: 100%; padding: 7px 12px 7px 32px; border: 1px solid var(--divider); border-radius: 20px; background: var(--card); color: var(--text); font-size: 13px; font-family: inherit; outline: none; transition: border-color 0.2s; }
+.search-wrap input:focus { border-color: var(--accent2); }
+.search-wrap .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 14px; color: var(--text2); pointer-events: none; }
+#topbar .right-btns { display: flex; gap: 6px; align-items: center; }
+.top-btn { background: none; border: 1px solid var(--divider); color: var(--text2); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: all 0.2s; font-family: inherit; white-space: nowrap; }
+.top-btn:hover { background: var(--hover); color: var(--text); border-color: var(--accent2); }
+.top-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.top-btn.upload-btn { background: #e74c3c; color: #fff; border-color: #e74c3c; }
+.top-btn.upload-btn:hover { background: #c0392b; }
+.user-dropdown { position: relative; }
+.user-dropdown .dropdown-menu { display: none; position: absolute; top: 42px; right: 0; background: var(--card); border: 1px solid var(--cardBorder); border-radius: 8px; min-width: 130px; box-shadow: 0 8px 24px var(--shadow); overflow: hidden; z-index: 60; }
+.user-dropdown .dropdown-menu.show { display: block; }
+.user-dropdown .dropdown-menu .dm-item { padding: 10px 16px; cursor: pointer; font-size: 13px; color: var(--text2); border-bottom: 1px solid var(--divider); transition: background 0.15s; }
+.user-dropdown .dropdown-menu .dm-item:hover { background: var(--hover); color: var(--text); }
+.user-dropdown .dropdown-menu .dm-item:last-child { border-bottom: none; color: #c0392b; }
+
+/* ====== Category tabs ====== */
+#category-tabs { display: flex; gap: 6px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; align-items: center; }
+.cat-tab { padding: 5px 16px; border-radius: 20px; border: 1px solid var(--divider); background: var(--card); color: var(--text2); cursor: pointer; font-size: 13px; font-family: inherit; transition: all 0.2s; }
+.cat-tab:hover { border-color: var(--accent2); color: var(--text); }
+.cat-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* ====== Recommended section ====== */
+.recommended-section { max-width: 1140px; margin: 0 auto 32px; padding: 0 24px; }
+.recommended-section .rec-header { font-size: 20px; font-weight: bold; color: var(--accent); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.recommended-section .rec-header .rec-icon { font-size: 24px; }
+.rec-scroll { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px; scroll-snap-type: x mandatory; }
+.rec-scroll::-webkit-scrollbar { height: 6px; }
+.rec-scroll::-webkit-scrollbar-thumb { background: var(--divider); border-radius: 3px; }
+.rec-card { min-width: 280px; max-width: 280px; flex-shrink: 0; scroll-snap-align: start; background: var(--card); border: 1px solid var(--cardBorder); border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 2px 8px var(--shadow); position: relative; }
+.rec-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px var(--shadow); }
+.rec-card .rec-cover { height: 140px; display: flex; align-items: center; justify-content: center; font-size: 36px; color: #fff; font-weight: bold; position: relative; }
+.rec-card .rec-cover .rec-cover-text { text-shadow: 0 2px 6px rgba(0,0,0,0.3); writing-mode: vertical-rl; letter-spacing: 2px; }
+.rec-card .rec-cover .rec-rank { position: absolute; top: 8px; left: 8px; width: 28px; height: 28px; border-radius: 50%; background: var(--star); color: #333; font-weight: bold; font-size: 14px; display: flex; align-items: center; justify-content: center; writing-mode: horizontal-tb; }
+.rec-card .rec-info { padding: 12px; }
+.rec-card .rec-info h3 { font-size: 15px; color: var(--text); margin-bottom: 4px; }
+.rec-card .rec-info .rec-meta { font-size: 11px; color: var(--text2); }
+.rec-card .rec-score { position: absolute; bottom: 8px; right: 10px; font-size: 13px; font-weight: bold; color: var(--star); }
+
+/* ====== Bookshelf ====== */
+#bookshelf { max-width: 1140px; margin: 0 auto; padding: 32px 24px; }
+#bookshelf h1 { text-align: center; font-size: 28px; margin-bottom: 8px; color: var(--text); letter-spacing: 3px; }
+#bookshelf .subtitle { text-align: center; color: var(--text2); margin-bottom: 6px; font-size: 14px; }
+.book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 24px; }
+.no-results { text-align: center; color: var(--text2); padding: 60px 0; font-size: 15px; }
+
+.book-card { background: var(--card); border: 1px solid var(--cardBorder); border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 2px 8px var(--shadow); }
+.book-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px var(--shadow); }
+.book-cover { height: 180px; display: flex; align-items: center; justify-content: center; font-size: 46px; color: #fff; letter-spacing: 4px; font-weight: bold; position: relative; }
+.book-cover .cover-text { text-shadow: 0 2px 8px rgba(0,0,0,0.3); writing-mode: vertical-rl; }
+.book-cover .cat-badge { position: absolute; top: 10px; right: 10px; padding: 2px 10px; border-radius: 10px; font-size: 10px; background: rgba(255,255,255,0.25); color: #fff; letter-spacing: 1px; writing-mode: horizontal-tb; }
+.book-cover .upload-badge { position: absolute; top: 10px; left: 10px; padding: 2px 8px; border-radius: 8px; font-size: 9px; background: rgba(231,76,60,0.85); color: #fff; letter-spacing: 1px; writing-mode: horizontal-tb; }
+.book-cover .rating-badge { position: absolute; bottom: 8px; left: 10px; padding: 3px 10px; border-radius: 10px; font-size: 12px; background: rgba(0,0,0,0.6); color: var(--star); font-weight: bold; writing-mode: horizontal-tb; letter-spacing: 0; }
+.book-cover .rating-badge .rating-num { font-size: 16px; }
+.book-cover .rating-badge .rating-count { font-size: 9px; color: #ccc; }
+.book-info { padding: 16px; }
+.book-info h3 { font-size: 17px; margin-bottom: 4px; color: var(--text); }
+.book-info .author { font-size: 12px; color: var(--text2); margin-bottom: 8px; }
+.book-info .desc { font-size: 12px; color: var(--text2); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.progress-bar { height: 3px; background: var(--divider); border-radius: 2px; margin-top: 10px; }
+.progress-bar .fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s; }
+.progress-label { font-size: 10px; color: var(--text2); margin-top: 3px; text-align: right; }
+mark { background: #ffe082; color: #333; padding: 0 1px; border-radius: 2px; }
+:root[data-theme="dark"] mark { background: #5a4a20; color: #ffe082; }
+
+/* ====== Reader ====== */
+#reader { display: none; height: calc(100vh - 52px); }
+#reader.active { display: flex; }
+#bookshelf.hidden { display: none; }
+#sidebar { width: 260px; min-width: 260px; background: var(--sidebar); border-right: 1px solid var(--divider); display: flex; flex-direction: column; transition: margin-left 0.3s; }
+#sidebar.collapsed { margin-left: -260px; }
+.sidebar-header { padding: 16px; border-bottom: 1px solid var(--divider); display: flex; align-items: center; justify-content: space-between; }
+.sidebar-header h3 { font-size: 14px; color: var(--text); }
+.sidebar-close { background: none; border: none; color: var(--text2); cursor: pointer; font-size: 18px; padding: 2px 6px; }
+.chapter-list { flex: 1; overflow-y: auto; padding: 8px 0; }
+.chapter-item { padding: 10px 16px; cursor: pointer; font-size: 13px; border-left: 3px solid transparent; color: var(--text2); transition: all 0.15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chapter-item:hover { background: var(--hover); color: var(--text); }
+.chapter-item.current { color: var(--accent); font-weight: bold; border-left-color: var(--accent); background: var(--hover); }
+.bookmarks-mini { border-top: 1px solid var(--divider); padding: 12px 16px; }
+.bookmarks-mini h4 { font-size: 12px; color: var(--text2); margin-bottom: 8px; }
+.bm-mini-item { font-size: 11px; color: var(--accent); cursor: pointer; padding: 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#content-area { flex: 1; overflow-y: auto; position: relative; }
+.content-header { padding: 16px 24px; border-bottom: 1px solid var(--divider); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.content-header .book-title { font-size: 16px; font-weight: bold; color: var(--text); }
+.content-header .chap-title { font-size: 13px; color: var(--text2); }
+.content-body { max-width: 700px; margin: 0 auto; padding: 40px 32px 30px; }
+.content-body .chapter-heading { text-align: center; font-size: 22px; font-weight: bold; margin-bottom: 32px; color: var(--text); }
+.content-body .chapter-text { font-size: var(--font-size, 17px); line-height: var(--line-height, 2); text-align: justify; letter-spacing: 0.5px; }
+.content-body .chapter-text p { text-indent: 2em; margin-bottom: 0.8em; }
+.nav-bottom { max-width: 700px; margin: 0 auto; padding: 0 32px 20px; display: flex; justify-content: space-between; gap: 12px; }
+.nav-btn { padding: 10px 24px; background: var(--card); border: 1px solid var(--cardBorder); border-radius: 8px; cursor: pointer; color: var(--text); font-family: inherit; font-size: 14px; transition: all 0.2s; }
+.nav-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+.nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ====== Rating section ====== */
+.rating-section { max-width: 700px; margin: 0 auto; padding: 0 32px 20px; border-top: 1px solid var(--divider); padding-top: 20px; }
+.rating-section .rating-header { font-size: 15px; font-weight: bold; color: var(--text); margin-bottom: 8px; }
+.rating-section .rating-current { font-size: 13px; color: var(--text2); margin-bottom: 10px; }
+.rating-stars { display: flex; gap: 4px; flex-wrap: wrap; }
+.rating-star { width: 32px; height: 32px; border-radius: 4px; border: 1px solid var(--divider); background: var(--bg); color: var(--text2); cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; font-family: inherit; }
+.rating-star:hover, .rating-star.active { background: var(--star); color: #fff; border-color: var(--star); font-weight: bold; }
+.rating-star.my-score { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* ====== Comments section ====== */
+.comments-section { max-width: 700px; margin: 0 auto; padding: 0 32px 40px; border-top: 1px solid var(--divider); padding-top: 20px; }
+.comments-section .comments-header { font-size: 15px; font-weight: bold; color: var(--text); margin-bottom: 12px; }
+.comment-form { display: flex; gap: 8px; margin-bottom: 18px; }
+.comment-form textarea { flex: 1; padding: 10px; border: 1px solid var(--divider); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 13px; font-family: inherit; resize: vertical; min-height: 60px; outline: none; }
+.comment-form textarea:focus { border-color: var(--accent2); }
+.comment-form .comment-submit { padding: 8px 18px; border-radius: 8px; border: none; background: var(--accent); color: #fff; cursor: pointer; font-family: inherit; font-size: 13px; white-space: nowrap; align-self: flex-end; }
+.comment-form .comment-submit:hover { opacity: 0.9; }
+.comment-list { max-height: 400px; overflow-y: auto; }
+.comment-item { padding: 12px 0; border-bottom: 1px solid var(--divider); }
+.comment-item .comment-user { font-size: 13px; font-weight: bold; color: var(--accent); margin-bottom: 2px; }
+.comment-item .comment-text { font-size: 13px; color: var(--text); line-height: 1.5; }
+.comment-item .comment-time { font-size: 10px; color: var(--text2); margin-top: 4px; }
+
+/* ====== Float toolbar ====== */
+#float-toolbar { position: fixed; bottom: 32px; right: 32px; z-index: 50; display: flex; flex-direction: column; gap: 8px; }
+.float-btn { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--cardBorder); background: var(--card); color: var(--text2); cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 2px 8px var(--shadow); }
+.float-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+#back-top { position: fixed; bottom: 100px; right: 32px; z-index: 50; width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--cardBorder); background: var(--card); color: var(--text2); cursor: pointer; font-size: 16px; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 8px var(--shadow); transition: all 0.2s; }
+#back-top:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* ====== Modals ====== */
+.modal-overlay { display: none; position: fixed; inset: 0; z-index: 199; background: rgba(0,0,0,0.4); }
+.modal-overlay.show { display: block; }
+.modal-panel { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card); border: 1px solid var(--cardBorder); border-radius: 16px; padding: 28px; z-index: 200; box-shadow: 0 12px 40px var(--shadow); width: 400px; max-height: 85vh; overflow-y: auto; }
+.modal-panel.wide { width: 560px; }
+.modal-panel.show { display: block; }
+.modal-title { font-size: 20px; font-weight: bold; margin-bottom: 18px; color: var(--text); text-align: center; }
+.modal-close { position: absolute; top: 12px; right: 16px; background: none; border: none; color: var(--text2); cursor: pointer; font-size: 20px; }
+.form-group { margin-bottom: 12px; }
+.form-group label { display: block; font-size: 13px; color: var(--text2); margin-bottom: 4px; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 9px 12px; border: 1px solid var(--divider); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 13px; font-family: inherit; outline: none; resize: vertical; }
+.form-group textarea { min-height: 80px; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent2); }
+.form-error { color: #e74c3c; font-size: 12px; margin-top: 4px; min-height: 16px; }
+.submit-btn { width: 100%; padding: 10px; border-radius: 8px; border: none; background: var(--accent); color: #fff; font-size: 15px; cursor: pointer; font-family: inherit; margin-top: 6px; transition: opacity 0.2s; }
+.submit-btn:hover { opacity: 0.9; }
+.switch-text { text-align: center; margin-top: 14px; font-size: 13px; color: var(--text2); }
+.switch-text a { color: var(--accent); cursor: pointer; text-decoration: underline; }
+
+/* Chapter editor in upload */
+.chapter-editor { border: 1px solid var(--divider); border-radius: 8px; padding: 12px; margin-bottom: 10px; background: var(--bg); }
+.chapter-editor .ch-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.chapter-editor .ch-header span { font-size: 12px; color: var(--text2); }
+.chapter-editor .ch-header button { background: none; border: none; color: #c0392b; cursor: pointer; font-size: 14px; }
+.add-chapter-btn { padding: 6px 16px; border: 1px dashed var(--divider); border-radius: 8px; background: none; color: var(--accent); cursor: pointer; font-size: 12px; font-family: inherit; width: 100%; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  #sidebar { width: 100%; min-width: 100%; position: fixed; top: 52px; left: 0; height: calc(100vh - 52px); z-index: 90; }
+  #sidebar.collapsed { margin-left: -100%; }
+  .content-body { padding: 24px 16px 20px; }
+  #float-toolbar { bottom: 16px; right: 16px; }
+  .modal-panel { width: 90vw; }
+  .book-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
+  #topbar { gap: 6px; }
+  .search-wrap { max-width: 140px; }
+  .rating-stars { gap: 2px; }
+  .rating-star { width: 28px; height: 28px; font-size: 11px; }
+}
+
+.setting-opt { padding: 4px 12px; border-radius: 6px; border: 1px solid var(--divider); background: var(--bg); color: var(--text2); cursor: pointer; font-size: 12px; font-family: inherit; transition: all 0.15s; }
+.setting-opt:hover { border-color: var(--accent2); }
+.setting-opt.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* Author actions on book card */
+.author-actions { position: absolute; bottom: 8px; right: 8px; display: flex; gap: 4px; z-index: 2; }
+.author-actions .aa-btn { padding: 3px 8px; border-radius: 6px; border: none; cursor: pointer; font-size: 10px; font-family: inherit; color: #fff; transition: opacity 0.2s; }
+.author-actions .aa-btn:hover { opacity: 0.85; }
+.author-actions .aa-edit { background: #3498db; }
+.author-actions .aa-del { background: #c0392b; }
+.book-card { position: relative; }
+
+/* Errata section */
+.errata-section { max-width: 700px; margin: 0 auto; padding: 0 32px 20px; border-top: 1px solid var(--divider); padding-top: 20px; }
+.errata-section .errata-header { font-size: 15px; font-weight: bold; color: var(--text); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+.errata-item { padding: 10px 0; border-bottom: 1px solid var(--divider); }
+.errata-item .errata-meta { font-size: 11px; color: var(--text2); margin-bottom: 4px; }
+.errata-item .errata-desc { font-size: 13px; color: var(--text); line-height: 1.5; }
+.errata-item .errata-suggestion { font-size: 12px; color: var(--accent); margin-top: 4px; }
+.errata-item .errata-actions { margin-top: 6px; display: flex; gap: 6px; }
+.errata-status { display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 10px; }
+.errata-status.open { background: #e74c3c20; color: #e74c3c; }
+.errata-status.fixed { background: #2ecc7120; color: #2ecc71; }
+</style>
+</head>
+<body>
+
+<!-- ====== Topbar ====== -->
+<nav id="topbar">
+  <span class="logo" onclick="goBookshelf()">云中书阁</span>
+  <div class="search-wrap"><span class="search-icon">🔍</span><input type="text" id="search-input" placeholder="搜书名、作者..." oninput="onSearch()"></div>
+  <div class="right-btns" id="topbar-right">
+    <button class="top-btn upload-btn" onclick="showUploadModal()">📝 投稿</button>
+    <button class="top-btn" onclick="showAuthModal('login')" id="btn-login">登录</button>
+    <button class="top-btn" onclick="showAuthModal('register')" id="btn-register">注册</button>
+    <div class="user-dropdown" id="user-dropdown" style="display:none">
+      <button class="top-btn primary" onclick="toggleUserMenu()" id="btn-user">👤 <span id="username-display"></span></button>
+      <div class="dropdown-menu" id="user-menu">
+        <div class="dm-item" onclick="showUploadModal()">📝 我要投稿</div>
+        <div class="dm-item" onclick="showBookmarks()">📑 我的书签</div>
+        <div class="dm-item" onclick="logout()">🚪 退出登录</div>
+      </div>
+    </div>
+    <button class="top-btn" onclick="toggleSidebar()" id="btn-toc" style="display:none">📖 目录</button>
+    <button class="top-btn" onclick="showBookmarks()" id="btn-bm" style="display:none">🔖 书签</button>
+    <button class="top-btn" onclick="showSettings()">⚙ 设置</button>
+  </div>
+</nav>
+
+<!-- ====== Bookshelf ====== -->
+<div id="bookshelf">
+  <h1>📚 云中书阁</h1>
+  <p class="subtitle">一卷在手，天下我有</p>
+  <div id="category-tabs"></div>
+  <div class="recommended-section" id="recommended-section" style="display:none"></div>
+  <div class="book-grid" id="book-grid"></div>
+  <div class="no-results" id="no-results" style="display:none">没有找到匹配的小说</div>
+</div>
+
+<!-- ====== Reader ====== -->
+<div id="reader">
+  <aside id="sidebar">
+    <div class="sidebar-header"><h3>章节目录</h3><button class="sidebar-close" onclick="toggleSidebar()">✕</button></div>
+    <div class="chapter-list" id="chapter-list"></div>
+    <div class="bookmarks-mini" id="bookmarks-mini"></div>
+  </aside>
+  <div id="content-area">
+    <div class="content-header"><span class="book-title" id="curr-book-title"></span><span class="chap-title" id="curr-chap-title"></span></div>
+    <div class="content-body" id="content-body"></div>
+    <div class="nav-bottom">
+      <button class="nav-btn" id="btn-prev" onclick="prevChapter()">← 上一章</button>
+      <button class="nav-btn" id="btn-bookmark" onclick="toggleBookmark()">🔖 添加书签</button>
+      <button class="nav-btn" id="btn-next" onclick="nextChapter()">下一章 →</button>
+    </div>
+    <div class="rating-section" id="rating-section"></div>
+    <div class="comments-section" id="comments-section"></div>
+    <div class="errata-section" id="errata-section"></div>
+  </div>
+</div>
+
+<div id="float-toolbar" style="display:none">
+  <button class="float-btn" title="目录" onclick="toggleSidebar()">📖</button>
+  <button class="float-btn" title="书签" onclick="showBookmarks()">🔖</button>
+  <button class="float-btn" title="设置" onclick="showSettings()">⚙</button>
+</div>
+<button id="back-top" onclick="document.getElementById('content-area').scrollTo({top:0,behavior:'smooth'})">⬆</button>
+
+<!-- ====== Modals ====== -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeAllModals()"></div>
+
+<!-- Login -->
+<div class="modal-panel" id="modal-login"><button class="modal-close" onclick="closeAllModals()">✕</button>
+  <div class="modal-title">登录</div>
+  <div class="form-group"><label>用户名</label><input type="text" id="login-username" placeholder="请输入用户名"></div>
+  <div class="form-group"><label>密码</label><input type="password" id="login-password" placeholder="请输入密码"></div>
+  <div class="form-error" id="login-error"></div>
+  <button class="submit-btn" onclick="doLogin()">登 录</button>
+  <div class="switch-text">还没有账号？<a onclick="showAuthModal('register')">立即注册</a></div>
+</div>
+
+<!-- Register -->
+<div class="modal-panel" id="modal-register"><button class="modal-close" onclick="closeAllModals()">✕</button>
+  <div class="modal-title">注册</div>
+  <div class="form-group"><label>用户名</label><input type="text" id="reg-username" placeholder="3-16位字母数字下划线中文"></div>
+  <div class="form-group"><label>密码</label><input type="password" id="reg-password" placeholder="至少6位密码"></div>
+  <div class="form-group"><label>确认密码</label><input type="password" id="reg-password2" placeholder="再次输入密码"></div>
+  <div class="form-error" id="reg-error"></div>
+  <button class="submit-btn" onclick="doRegister()">注 册</button>
+  <div class="switch-text">已有账号？<a onclick="showAuthModal('login')">立即登录</a></div>
+</div>
+
+<!-- Errata form -->
+<div class="modal-panel" id="modal-errata"><button class="modal-close" onclick="closeAllModals()">✕</button>
+  <div class="modal-title">📝 纠错反馈</div>
+  <div class="form-group"><label>章节</label><input type="text" id="errata-chapter" readonly style="background:var(--bg2)"></div>
+  <div class="form-group"><label>错误描述 *</label><textarea id="errata-desc" placeholder="请描述发现的错误（错别字、逻辑矛盾等）..." rows="3"></textarea></div>
+  <div class="form-group"><label>修改建议</label><textarea id="errata-suggestion" placeholder="建议如何修改（可选）..." rows="2"></textarea></div>
+  <div class="form-error" id="errata-error"></div>
+  <button class="submit-btn" onclick="submitErrata()">提交纠错</button>
+</div>
+<div class="modal-panel wide" id="modal-upload"><button class="modal-close" onclick="closeAllModals()">✕</button>
+  <div class="modal-title">📝 投稿小说</div>
+  <div class="form-group"><label>书名 *</label><input type="text" id="up-title" placeholder="请输入小说书名"></div>
+  <div class="form-group"><label>作者笔名 *</label><input type="text" id="up-author" placeholder="请输入作者笔名"></div>
+  <div class="form-group"><label>分类 *</label>
+    <select id="up-category"><option value="scifi">科幻</option><option value="romance">言情</option><option value="wuxia">武侠</option><option value="mystery">悬疑</option><option value="history">历史</option></select></div>
+  <div class="form-group"><label>简介</label><textarea id="up-desc" placeholder="简单介绍一下这部小说..." rows="2"></textarea></div>
+  <div class="form-group"><label>章节内容 *（至少一章）</label>
+    <div id="chapter-editors">
+      <div class="chapter-editor"><div class="ch-header"><span>第1章</span></div>
+        <input type="text" class="ch-title" placeholder="章节标题（可选）" style="width:100%;margin-bottom:6px;padding:7px 10px;border:1px solid var(--divider);border-radius:6px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit">
+        <textarea class="ch-content" placeholder="请输入章节内容..." style="width:100%;min-height:100px;padding:8px;border:1px solid var(--divider);border-radius:6px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;resize:vertical"></textarea>
+      </div>
+    </div>
+    <button class="add-chapter-btn" onclick="addChapterField()" style="margin-top:6px">+ 添加章节</button>
+  </div>
+  <div class="form-error" id="up-error"></div>
+  <button class="submit-btn" onclick="submitNovel()">提交投稿</button>
+</div>
+
+<!-- Settings -->
+<div class="modal-panel" id="settings-panel"><button class="modal-close" onclick="closeAllModals()">✕</button>
+  <div class="modal-title">阅读设置</div>
+  <div class="form-group" style="display:flex;justify-content:space-between;align-items:center"><label>字体大小</label><div id="font-size-opts" style="display:flex;gap:4px"></div></div>
+  <div class="form-group" style="display:flex;justify-content:space-between;align-items:center"><label>主题</label><div id="theme-opts" style="display:flex;gap:4px"></div></div>
+  <div class="form-group" style="display:flex;justify-content:space-between;align-items:center"><label>行间距</label><div id="line-height-opts" style="display:flex;gap:4px"></div></div>
+  <div class="form-group" style="display:flex;justify-content:space-between;align-items:center"><label>字体</label><div id="font-family-opts" style="display:flex;gap:4px"></div></div>
+</div>
+
+<!-- Bookmarks -->
+<div class="modal-panel" id="bookmark-panel" style="max-height:500px;overflow-y:auto"><button class="modal-close" onclick="closeAllModals()">✕</button>
+  <div class="modal-title">我的书签</div>
+  <div id="bookmark-list"><p style="color:var(--text2);font-size:13px;text-align:center">暂无书签</p></div>
+</div>
+
+<script>
+// ==================== SHA-256 (native crypto API) ====================
+async function sha256(str) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(str);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// ==================== Data ====================
+const CATEGORIES = ['全部','推荐','科幻','言情','武侠','悬疑','历史','奇幻','都市','灵异','游戏','军事'];
+const CAT_MAP = {'科幻':'scifi','言情':'romance','武侠':'wuxia','悬疑':'mystery','历史':'history','奇幻':'fantasy','都市':'urban','灵异':'horror','游戏':'gaming','军事':'military'};
+const COVER_GRADIENTS = {
+  scifi: 'linear-gradient(135deg,#0c1445,#1a3a6c,#2d5aa0)',
+  romance: 'linear-gradient(135deg,#4a6fa5,#6b8fc0,#9bb5d6)',
+  wuxia: 'linear-gradient(135deg,#2c1810,#4a2c17,#6b3a20)',
+  mystery: 'linear-gradient(135deg,#1a1a1a,#2d2d2d,#444)',
+  history: 'linear-gradient(135deg,#5c1a1a,#8b2e2e,#a94442)',
+  fantasy: 'linear-gradient(135deg,#1a0a3e,#3d1a6e,#6b3fa0)',
+  urban: 'linear-gradient(135deg,#1a3a4a,#2d6078,#4a90a4)',
+  horror: 'linear-gradient(135deg,#0d0d0d,#1a0a0a,#330d0d)',
+  gaming: 'linear-gradient(135deg,#0a1a2e,#1a3d5c,#2d6b99)',
+  military: 'linear-gradient(135deg,#1a2a0a,#3d4a1a,#5a6b2a)',
+};
+const COVER_EMOJI = {scifi:'🌌',romance:'🌧',wuxia:'⚔',mystery:'🔍',history:'🏯',fantasy:'🔮',urban:'🏙',horror:'👻',gaming:'🎮',military:'🎖'};
+
+const BUILTIN_NOVELS = [
+  {id:'xingchen',title:'星辰之下',author:'凌云',category:'scifi',desc:'在遥远的未来，人类文明已经遍布银河系。一个普通的星际快递员，偶然发现了一个惊天秘密，从此踏上拯救文明的旅程。',chapters:[
+    {id:'ch1',title:'第一章  平凡的快递员',content:['银河历3157年，人类已经在银河系中建立了庞大的星际文明。数千颗星球上都有人类的足迹，而连接这一切的，是遍布星海的虫洞网络。','陆辰是"星辰快递"公司的一名普通员工，每天的工作就是驾驶他那艘破旧的货运飞船"铁壳号"，在各个星球之间运送包裹。','这份工作没什么前途，但胜在稳定。陆辰今年二十五岁，从十八岁拿到星际航行执照开始，已经干了七年快递员。他去过上百颗星球，却从未真正在哪颗星球上停留超过三天。','"铁壳号，启动自检程序。"陆辰拍了拍控制台，老旧的飞船发出嘎吱嘎吱的响声，引擎有气无力地嗡鸣着，像是一个还没睡醒的老人。','今天他要送的是一批从地球母星寄出的特殊货物——据说是一些科研样本，收货方是位于猎户座边缘的"深空七号"实验站。这批货物的运费高得离谱，但陆辰也懒得多问。干快递这行，少问多送是基本原则。','飞船缓缓驶离了空港，进入了虫洞通道。窗外是扭曲的星光，如同流动的颜料。陆辰把座椅放倒，准备打个盹——虫洞航行大概需要六个小时。','然而，就在他即将入睡的时候，一阵急促的警报声突然响起。货舱里，有什么东西在发光。']},
+    {id:'ch2',title:'第二章  发光的货物',content:['陆辰猛地从座椅上弹起来，差点撞到天花板。警报器尖叫着，货舱方向的温度传感器显示温度正在急剧升高。','"该死！"他骂了一声，手忙脚乱地打开了货舱监控。屏幕上，一个标着"S级机密"的密封箱正在发出幽蓝色的光，箱体周围的温度已经上升到了三百度，而且还在继续升高。','陆辰赶紧启动了货舱的冷却系统，但毫无效果。那个密封箱的光芒越来越强，最后——伴随着一声清脆的碎裂声——箱子裂开了一道缝。','光芒从缝隙中涌出，如同液态的星辰。陆辰目瞪口呆地看着监控画面，一个透明的人形轮廓从光芒中浮现。','它看起来像一个年轻女子，但身体完全由光构成，半透明的轮廓闪烁着星辉。她缓缓睁开了眼睛——那眼睛里仿佛装着整个银河。','"不要害怕。"一个声音直接在陆辰的脑海中响起。"我需要你的帮助。"','陆辰在太空中跑了七年快递，见过不少奇奇怪怪的东西，但一个会说话的光之生命体？这绝对是头一回。"你……你是什么？"他声音有些发颤。','"我是星灵——一个由恒星的量子意识凝聚而成的生命。有人正在猎杀像我这样的存在，我需要你帮助我找到其他星灵，阻止这场屠杀。"']},
+    {id:'ch3',title:'第三章  猎手',content:['陆辰花了好一会儿才让自己相信这不是在做梦。星灵——自称"瑶光"的存在——用她那种直接传入意识的方式，向他解释了事情的来龙去脉。','银河系中有极少数恒星在漫长岁月中产生了量子层面的意识——这便是星灵。它们原本各自沉睡在自己的恒星中，直到最近，一个名为"猎星者"的神秘组织开始用某种技术捕获和抽取星灵的能量。','"他们的目标是利用星灵的能量制造一种前所未有的大规模杀伤性武器。"瑶光说，"我所在的恒星——天璇星——已经被他们摧毁了。我是少数逃脱的星灵之一。"','陆辰挠了挠头。"可是我只是一个快递员啊，我能做什么？"','"瑶光"的光芒闪烁了一下，似乎在笑。"正因如此。没有人会注意一个普通的快递员。你可以自由穿行于各个星系，而不会引起猎星者的怀疑。我需要你带我去找其他的星灵，在他们被猎杀之前发出警告。"','就在这时，"铁壳号"的雷达突然发出了尖锐的警报——三艘无标识的黑色战舰正在快速逼近，它们船身上的能量炮已经开始充能。','"他们来了。"瑶光的声音第一次带上了恐惧。"猎星者发现我了。"','陆辰咬紧了牙关。他这辈子从没开过战斗机，也从没参加过任何战斗。但现在，他别无选择。他一把抓住操纵杆，将引擎功率推到最大。"坐稳了！"']}
+  ]},
+  {id:'jiangnanyu',title:'江南雨',author:'苏晚',category:'romance',desc:'民国初年的江南小镇，一位留学归来的青年与一位绣坊女子在烟雨中相遇。时代的浪潮之下，两个人的命运如雨丝般交织缠绵。',chapters:[
+    {id:'ch1',title:'第一章  烟雨归人',content:['民国六年，三月的江南。','细雨如丝，密密地织着。青石板路被雨水浸得发亮，倒映着两岸白墙黛瓦的轮廓。空气中弥漫着栀子花和新翻泥土的气息，还有河面上飘来的若有若无的橹声。','沈清和站在乌篷船上，撑着一把油纸伞。船缓缓穿过石拱桥的桥洞，桥上有卖花的小姑娘提着竹篮匆匆跑过，留下一串清脆的木屐声。','他是前年去的日本，在早稻田大学念了两年的政治经济。如今毕业归来，家里已经在镇上给他谋了一份差事——在县里的教育科做个科员。不算什么大官，但在这样的小镇，也算体面。','"少爷，到了。"船家老杨把橹一收，船身微微晃了晃，靠在了埠头上。','沈清和提着藤箱上了岸。码头边上是一家绣坊，门楣上挂着一块匾额，写着"锦华绣庄"四个字。门半掩着，透出昏黄的灯光和绣娘们细细的说话声。','他正要往前走，门忽然开了。一个穿着月白色旗袍的年轻女子走了出来，手里端着一盆水。她看见门口站着一个陌生的年轻人，微微怔了一下，随即侧身让开。','"先生请进。"声音轻得像落在水面的雨滴。','沈清和摇了摇头，刚要解释，那女子已经把门推开了大半，引着他往里走。他这才看清她的模样——约莫十八九岁，眉眼清秀，头发挽了个简单的髻，素净得像一幅水墨画。','沈清和忍不住笑了。"我不是来订绣品的。只是路过，在门口站了站。"','那女子抬起眼，这才发现自己闹了个误会。她的脸微微红了，但并未慌乱，只是合上账簿，淡然道："那是我冒昧了。先生慢走。"','沈清和点了点头，转身离开。走出几步，忍不住回头看了一眼，恰好对上她的目光。她很快低下头去，像受惊的雀儿。']},
+    {id:'ch2',title:'第二章  锦华绣庄',content:['沈清和在教育科安顿下来之后，才知道那个绣坊女子的名字叫苏浣纱——一个很有诗意的名字，"浣纱"二字，像是从古诗里走出来的。','锦华绣庄是苏家的产业，苏浣纱的父亲苏锦堂是镇上最好的绣工。可惜苏老爷子上个月中风瘫了，绣庄的生意便全落在了苏浣纱和两个小徒弟身上。','沈清和借着教育科要采购一批锦旗的名义，第二次踏进了锦华绣庄。这次他倒是真的来订东西的，只不过原本这事随便派个科员来就行，他却偏偏亲自来了。','苏浣纱见了他，先是愣了一下，随即认出了他。"是你？"','"是我。"沈清和笑着说，"这回真是来订货的——教育科要做二十面锦旗，表彰优秀教员。听说你家绣工最好。"','苏浣纱翻开账簿，认真地记下了规格和数量。她写字的时候，额前一缕碎发垂下来，随着她的呼吸微微晃动。沈清和发现自己一直在盯着那缕头发看，连忙移开了目光。','谈完正事，沈清和没有急着走。他看着墙上挂着的一幅苏绣，那是一幅"烟雨江南"——针脚细密，色彩柔和，雨丝从檐角垂落的感觉被绣得活灵活现。','"这幅是谁绣的？"他问。','"是我。"苏浣纱说，语气平淡，但眼睛里多了一丝光彩。"绣了三个月。"','"很美。"沈清和由衷地说。"江南的雨，就该是这个样子。"','苏浣纱看了他一眼，似乎在判断他这话是客套还是真心。片刻后，她轻轻说了声"谢谢"，声音比刚才柔和了许多。','从那天起，沈清和成了锦华绣庄的常客。有时是来订东西，有时什么也不订，只是带一包桂花糕，坐下来看她们绣花。']}
+  ]},
+  {id:'jianying',title:'剑影',author:'萧尘',category:'wuxia',desc:'一柄残剑，一卷残谱，一个被灭门的少年。十年蛰伏，一朝拔剑，天下谁人不识君？江湖风云再起，恩怨情仇尽在剑影之中。',chapters:[
+    {id:'ch1',title:'第一章  灭门之夜',content:['那一夜，月如银盘，照得青云山庄的琉璃瓦泛着寒光。','十二岁的叶无锋是被他师父从被窝里拖出来的。他还没弄清楚怎么回事，就听到外面传来惨叫声和兵刃相交的刺耳声响。师父的手冰凉，按着他的肩膀，声音沙哑而急促："不要出声，跟我走。"','他们穿过密道，身后是越来越远的厮杀声。叶无锋回头看了一眼，透过密道的缝隙，他看到父亲挥舞着青云剑奋力抵抗，母亲护着年幼的妹妹缩在墙角。然后——一道剑光闪过。','他再也看不到更多了。师父捂住他的眼睛，拖着他消失在漆黑的密道里。','那一夜，青云山庄满门一百二十三口，只有他一个人活了下来。','——','十年后，江湖上多了一个无名剑客。没有人知道他的来历，只知道他用的是一柄锈迹斑斑的残剑，剑法却凌厉异常。他四处挑战各大门派，从无败绩。','他从不报姓名，但江湖人给他起了个绰号——"残剑"。','"这剑以前断过。"有人说。','"我听说，十年前青云山庄灭门案里，庄主叶青天的佩剑就是断的。"另一个人压低了声音。','说这话的人第二天被发现死在了客栈的床上。胸口一个剑孔，干净利落，没有一滴多余的血。凶手的手很稳。','官府查了半个月，什么都没有查到。但所有人都知道，那把剑的主人，回来了。']},
+    {id:'ch2',title:'第二章  江南风雨楼',content:['风雨楼是江南最大的江湖势力，楼主"铁掌"韩震山，一双铁砂掌打遍江南无敌手。这些年他广收门徒，势力遍布江南七州，黑白两道都要给他几分薄面。','叶无锋站在风雨楼宏伟的门楼前，抬头看着那块烫金匾额。十年前的灭门之夜，他曾亲眼看见一个使铁砂掌的黑衣人一掌劈开了山庄的大门。他在暗处躲了十年，追查了十年，所有的线索都指向了这里。','"来者何人？"守门的两个大汉挡住了他的去路，看了看他腰间的残剑，露出不屑的笑容。"哪里来的乞丐，这把破剑也敢拿出来丢人？"','叶无锋没有答话。他只是微微动了一下手腕。','寒光一闪，两个大汉腰间的佩剑齐根而断，断口光滑如镜。他们甚至没有看清他是如何出剑的。','叶无锋从他们中间走过，声音冰冷："告诉韩震山，故人之子来访。"','风雨楼的大堂里，韩震山正坐在太师椅上喝茶。他五十岁上下，身形魁梧，一双大手骨节粗大，确实是练铁砂掌的高手。','但当韩震山踏进偏厅的那一刻，他愣住了。叶无锋站在那里，手中那柄残剑在烛光下泛着幽幽的寒光。','"这把剑……"韩震山的瞳孔猛然收缩。"你是叶青天的什么人？"','"他是我父亲。"叶无锋一字一顿地说。"十年前，你灭我满门。今日，我来讨这笔血债。"','韩震山沉默了很久。然后，他苦笑了一声。"孩子，你找错人了。"']}
+  ]},
+  {id:'shierlou',title:'第十二层楼',author:'墨白',category:'mystery',desc:'深夜的写字楼里，保安老周发现电梯总是莫名停在并不存在的第十二层。一桩桩诡异事件背后，隐藏着一个令人窒息的真相。',chapters:[
+    {id:'ch1',title:'第一章  不存在的楼层',content:['老周在这栋写字楼做了十五年保安。他熟悉这里的每一个角落——地面停车场有二百三十七个车位，地下车库有三层，大楼一共十一层。','是十一层，不是十二层。','但最近一个月，监控室的电梯显示屏上，每到凌晨两点四十七分，电梯就会自动从十一楼往上走一格。屏幕上会短暂地出现一个"12F"的字样，闪烁三次，然后电梯回到一楼。','老周第一次看到的时候，以为是系统故障。他打了报修电话，维修工来了三次，换了主板，换了线路，问题依旧。','"周师傅，这楼真没有十二层？"维修工第四次来的时候，脸色已经不太对了。','"我在这儿十五年，这楼几层我还能不知道？"老周有些不耐烦，但心里也在发毛。他翻看了施工图纸，物业档案，甚至找了当年的开发商。所有资料都表明：这栋楼只有十一层。','但监控不会说谎，至少他之前是这么认为的。','这天夜里，老周决定亲自去看看。凌晨两点四十分，他走进电梯，按下了十一楼的按钮。电梯缓缓上升，数字一格一格跳动着。老周攥紧手电筒，手心全是汗。','电梯停在了十一楼。门开了，外面是正常的走廊，应急灯发出昏黄的光，空无一人。','老周松了口气。但就在这时，电梯门关上了，而他的手还没来得及按下任何按钮。','数字继续跳动了——"12"。门再次打开的时候，外面不是走廊。']}
+  ]},
+  {id:'changhenge',title:'长恨歌',author:'柳青',category:'history',desc:'安史之乱前夕，长安城中暗流涌动。一个胡商、一个乐师、一个禁军统领，三人的命运在盛世末年轰然相撞，谱写一曲盛世的悲歌。',chapters:[
+    {id:'ch1',title:'第一章  长安月',content:['天宝十三载，八月十五，长安。','这是大唐最繁华的年代。东西两市商贾云集，胡人牵着骆驼穿过朱雀大街，酒肆里传出琵琶和胡笳的合奏声。整座长安城像是一个永不落幕的盛宴，每个人都沉浸在盛世的幻梦中。','阿史那康站在西市口，看着眼前熙熙攘攘的人流。他是粟特人，十年前跟着父亲的商队来到长安，从此再也没有离开。如今他在西市开了一家香料铺，生意做得风生水起，连宫里的采买太监都时常光顾。','但今天，他不是来看生意的。他袖子里藏着一封信——一封来自范阳的信。','送信的人已经死了。死在长安城外的渭水河边，尸体上插着三支羽箭，箭杆上刻着范阳军的标记。','阿史那康不用拆信就知道里面写着什么。最近半年，西市的粟特商人一个接一个地消失，他们的铺子被查封，货物被充公。官府的说法是"勾结外敌"，但阿史那康知道真相远不止这么简单。','"康兄。"一个声音从他身后响起。阿史那康回头，看到了一张再熟悉不过的脸——李龟年，宫中第一乐师，玄宗的座上宾。','"李兄怎么来了？"阿史那康笑着迎上去，但那笑容很僵硬。','李龟年走到他身边，压低声音说了一句话。阿史那康的脸色瞬间变了。','"安禄山，反了。"']}
+  ]}
+];
+
+function getAllNovels() {
+  const uploaded = getUploadedNovels();
+  return [...BUILTIN_NOVELS, ...uploaded];
+}
+
+// ==================== Uploaded novels ====================
+function getUploadedNovels() {
+  try { return JSON.parse(localStorage.getItem('novel_uploads')) || []; } catch(e) { return []; }
+}
+function saveUploadedNovels(novels) { localStorage.setItem('novel_uploads', JSON.stringify(novels)); }
+
+function addChapterField() {
+  const container = document.getElementById('chapter-editors');
+  const count = container.querySelectorAll('.chapter-editor').length + 1;
+  const div = document.createElement('div');
+  div.className = 'chapter-editor';
+  div.innerHTML = `<div class="ch-header"><span>第${count}章</span><button onclick="this.closest('.chapter-editor').remove()">✕</button></div>
+    <input type="text" class="ch-title" placeholder="章节标题（可选）" style="width:100%;margin-bottom:6px;padding:7px 10px;border:1px solid var(--divider);border-radius:6px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit">
+    <textarea class="ch-content" placeholder="请输入章节内容..." style="width:100%;min-height:100px;padding:8px;border:1px solid var(--divider);border-radius:6px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;resize:vertical"></textarea>`;
+  container.appendChild(div);
+}
+
+function showUploadModal() {
+  if (!App.user) { showAuthModal('login'); return; }
+  closeAllModals();
+  document.getElementById('modal-upload').dataset.editId = '';
+  document.getElementById('modal-upload').querySelector('.modal-title').textContent = '📝 投稿小说';
+  document.querySelector('#modal-upload .submit-btn').textContent = '提交投稿';
+  document.querySelector('#modal-upload .submit-btn').onclick = submitNovel;
+  document.getElementById('modal-overlay').classList.add('show');
+  document.getElementById('modal-upload').classList.add('show');
+  document.getElementById('up-title').value = '';
+  document.getElementById('up-author').value = '';
+  document.getElementById('up-desc').value = '';
+  document.getElementById('up-error').textContent = '';
+  document.getElementById('chapter-editors').innerHTML = `<div class="chapter-editor"><div class="ch-header"><span>第1章</span></div>
+    <input type="text" class="ch-title" placeholder="章节标题（可选）" style="width:100%;margin-bottom:6px;padding:7px 10px;border:1px solid var(--divider);border-radius:6px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit">
+    <textarea class="ch-content" placeholder="请输入章节内容..." style="width:100%;min-height:100px;padding:8px;border:1px solid var(--divider);border-radius:6px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;resize:vertical"></textarea></div>`;
+}
+
+function submitNovel() {
+  const title = document.getElementById('up-title').value.trim();
+  const author = document.getElementById('up-author').value.trim();
+  const category = document.getElementById('up-category').value;
+  const desc = document.getElementById('up-desc').value.trim();
+  const errEl = document.getElementById('up-error');
+
+  if (!title) { errEl.textContent = '请输入书名'; return; }
+  if (!author) { errEl.textContent = '请输入作者笔名'; return; }
+
+  const editors = document.querySelectorAll('#chapter-editors .chapter-editor');
+  const chapters = [];
+  editors.forEach((ed, i) => {
+    const chTitle = ed.querySelector('.ch-title').value.trim() || `第${i+1}章`;
+    const chContent = ed.querySelector('.ch-content').value.trim();
+    if (chContent) {
+      chapters.push({
+        id: 'ch' + (i+1),
+        title: `第${i+1}章  ${chTitle}`,
+        content: chContent.split('\n').filter(l => l.trim())
+      });
+    }
+  });
+
+  if (chapters.length === 0) { errEl.textContent = '请至少填写一章内容'; return; }
+
+  const novel = {
+    id: 'upload_' + Date.now(),
+    title, author, category, desc,
+    cover: COVER_GRADIENTS[category],
+    emoji: COVER_EMOJI[category],
+    chapters,
+    uploadedBy: App.user.username,
+    uploadedAt: Date.now(),
+    isUploaded: true,
+  };
+
+  const uploaded = getUploadedNovels();
+  uploaded.unshift(novel);
+  saveUploadedNovels(uploaded);
+
+  closeAllModals();
+  App.currentCategory = '全部';
+  renderBookshelf();
+}
+
+// ==================== Delete & Edit novels ====================
+function deleteNovel(bookId) {
+  if (!App.user) return;
+  const uploaded = getUploadedNovels();
+  const novel = uploaded.find(n => n.id === bookId);
+  if (!novel || novel.uploadedBy !== App.user.username) return;
+  if (!confirm('确定要删除《' + novel.title + '》吗？此操作不可撤销！')) return;
+  const idx = uploaded.indexOf(novel);
+  uploaded.splice(idx, 1);
+  saveUploadedNovels(uploaded);
+  // Clean associated data
+  localStorage.removeItem('novel_comments_' + bookId);
+  localStorage.removeItem('novel_ratings_' + bookId);
+  localStorage.removeItem('novel_errata_' + bookId);
+  // Clear bookmarks for this book
+  Object.keys(App.bookmarks).forEach(k => { if (App.bookmarks[k].bookId === bookId) delete App.bookmarks[k]; });
+  saveBookmarks();
+  if (App.currentBookId === bookId) goBookshelf();
+  renderBookshelf();
+}
+
+function editNovel(bookId) {
+  if (!App.user) return;
+  const uploaded = getUploadedNovels();
+  const novel = uploaded.find(n => n.id === bookId);
+  if (!novel || novel.uploadedBy !== App.user.username) return;
+  closeAllModals();
+  document.getElementById('modal-overlay').classList.add('show');
+  document.getElementById('modal-upload').classList.add('show');
+  document.getElementById('modal-upload').dataset.editId = bookId;
+  document.getElementById('modal-upload').querySelector('.modal-title').textContent = '✎ 编辑作品';
+  document.getElementById('up-title').value = novel.title;
+  document.getElementById('up-author').value = novel.author;
+  document.getElementById('up-category').value = novel.category;
+  document.getElementById('up-desc').value = novel.desc || '';
+  document.getElementById('up-error').textContent = '';
+  // Populate chapters
+  const container = document.getElementById('chapter-editors');
+  container.innerHTML = novel.chapters.map((ch, i) =>
+    '<div class="chapter-editor"><div class="ch-header"><span>第' + (i+1) + '章</span>' + (i>0?'<button onclick="this.closest(\'.chapter-editor\').remove()">✕</button>':'') + '</div>' +
+    '<input type="text" class="ch-title" value="' + ch.title.replace(/"/g,'&quot;') + '" style="width:100%;margin-bottom:6px;padding:7px 10px;border:1px solid var(--divider);border-radius:6px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit">' +
+    '<textarea class="ch-content" style="width:100%;min-height:100px;padding:8px;border:1px solid var(--divider);border-radius:6px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;resize:vertical">' + ch.content.join('\n') + '</textarea></div>'
+  ).join('');
+  document.querySelector('#modal-upload .submit-btn').textContent = '保存修改';
+  document.querySelector('#modal-upload .submit-btn').onclick = submitEdit;
+}
+
+function submitEdit() {
+  const bookId = document.getElementById('modal-upload').dataset.editId;
+  const title = document.getElementById('up-title').value.trim();
+  const author = document.getElementById('up-author').value.trim();
+  const category = document.getElementById('up-category').value;
+  const desc = document.getElementById('up-desc').value.trim();
+  const errEl = document.getElementById('up-error');
+  if (!title) { errEl.textContent = '请输入书名'; return; }
+  if (!author) { errEl.textContent = '请输入作者笔名'; return; }
+
+  const editors = document.querySelectorAll('#chapter-editors .chapter-editor');
+  const chapters = [];
+  editors.forEach((ed, i) => {
+    const chTitle = ed.querySelector('.ch-title').value.trim() || ('第'+(i+1)+'章');
+    const chContent = ed.querySelector('.ch-content').value.trim();
+    if (chContent) {
+      chapters.push({ id: 'ch'+(i+1), title: '第'+(i+1)+'章  '+chTitle, content: chContent.split('\n').filter(l=>l.trim()) });
+    }
+  });
+  if (chapters.length === 0) { errEl.textContent = '请至少保留一章内容'; return; }
+
+  const uploaded = getUploadedNovels();
+  const novel = uploaded.find(n => n.id === bookId);
+  if (!novel) return;
+  novel.title = title; novel.author = author; novel.category = category; novel.desc = desc;
+  novel.chapters = chapters;
+  novel.cover = COVER_GRADIENTS[category];
+  novel.emoji = COVER_EMOJI[category];
+  saveUploadedNovels(uploaded);
+
+  closeAllModals();
+  App.currentCategory = '全部';
+  renderBookshelf();
+  if (App.currentBookId === bookId) openReader(bookId, App.currentChapterIdx);
+}
+
+// ==================== Errata system ====================
+function getErrata(bookId) {
+  try { return JSON.parse(localStorage.getItem('novel_errata_' + bookId)) || []; } catch(e) { return []; }
+}
+function saveErrata(bookId, errata) { localStorage.setItem('novel_errata_' + bookId, JSON.stringify(errata)); }
+
+function showErrataForm() {
+  if (!App.user) { showAuthModal('login'); return; }
+  const allNovels = getAllNovels(); const book = allNovels.find(n => n.id === App.currentBookId);
+  if (!book) return;
+  const ch = book.chapters[App.currentChapterIdx];
+  closeAllModals();
+  document.getElementById('modal-overlay').classList.add('show');
+  document.getElementById('modal-errata').classList.add('show');
+  document.getElementById('errata-chapter').value = ch.title;
+  document.getElementById('errata-desc').value = '';
+  document.getElementById('errata-suggestion').value = '';
+  document.getElementById('errata-error').textContent = '';
+}
+
+function submitErrata() {
+  const desc = document.getElementById('errata-desc').value.trim();
+  const suggestion = document.getElementById('errata-suggestion').value.trim();
+  const errEl = document.getElementById('errata-error');
+  if (!desc) { errEl.textContent = '请描述发现的错误'; return; }
+
+  const bookId = App.currentBookId;
+  const ch = getAllNovels().find(n=>n.id===bookId).chapters[App.currentChapterIdx];
+  const errata = getErrata(bookId);
+  errata.unshift({
+    id: 'e' + Date.now(),
+    chapterIdx: App.currentChapterIdx,
+    chapterTitle: ch.title,
+    description: desc,
+    suggestion: suggestion,
+    username: App.user.username,
+    createdAt: Date.now(),
+    status: 'open',
+  });
+  saveErrata(bookId, errata);
+  closeAllModals();
+  renderErrataPanel(bookId);
+}
+
+function markErrataFixed(bookId, errataId, e) {
+  e.stopPropagation();
+  const errata = getErrata(bookId);
+  const item = errata.find(er => er.id === errataId);
+  if (item) { item.status = item.status === 'fixed' ? 'open' : 'fixed'; }
+  saveErrata(bookId, errata);
+  renderErrataPanel(bookId);
+}
+
+function deleteErrata(bookId, errataId, e) {
+  e.stopPropagation();
+  let errata = getErrata(bookId);
+  errata = errata.filter(er => er.id !== errataId);
+  saveErrata(bookId, errata);
+  renderErrataPanel(bookId);
+}
+
+function renderErrataPanel(bookId) {
+  const allNovels = getAllNovels(); const book = allNovels.find(n => n.id === bookId);
+  if (!book) { document.getElementById('errata-section').innerHTML = ''; return; }
+  const errata = getErrata(bookId);
+  const isAuthor = book.isUploaded && App.user && App.user.username === book.uploadedBy;
+  const openCount = errata.filter(e => e.status === 'open').length;
+
+  let html = '<div class="errata-header"><span>📝 纠错反馈';
+  if (openCount > 0) html += ' <span style="color:#e74c3c;font-size:12px">(' + openCount + '条未处理)</span>';
+  html += '</span>';
+  html += '<button class="top-btn" onclick="showErrataForm()">+ 提交纠错</button>';
+  html += '</div>';
+
+  if (errata.length === 0) {
+    html += '<p style="color:var(--text2);font-size:12px;text-align:center;padding:10px 0">暂无纠错反馈</p>';
+  } else {
+    errata.forEach(er => {
+      const d = new Date(er.createdAt);
+      const timeStr = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+      html += '<div class="errata-item">';
+      html += '<div class="errata-meta">' + er.username + ' · ' + er.chapterTitle + ' · ' + timeStr + ' <span class="errata-status ' + er.status + '">' + (er.status==='open'?'待处理':'已修复') + '</span></div>';
+      html += '<div class="errata-desc">' + er.description + '</div>';
+      if (er.suggestion) html += '<div class="errata-suggestion">💡 建议：' + er.suggestion + '</div>';
+      if (isAuthor) {
+        html += '<div class="errata-actions"><button class="top-btn" style="font-size:10px;padding:2px 8px" onclick="markErrataFixed(\''+bookId+'\',\''+er.id+'\',event)">' + (er.status==='open'?'✓ 标记已修复':'↩ 重新打开') + '</button><button class="top-btn" style="font-size:10px;padding:2px 8px;color:#c0392b" onclick="deleteErrata(\''+bookId+'\',\''+er.id+'\',event)">删除</button></div>';
+      }
+      html += '</div>';
+    });
+  }
+  document.getElementById('errata-section').innerHTML = html;
+}
+function getComments(bookId) {
+  try { return JSON.parse(localStorage.getItem('novel_comments_' + bookId)) || []; } catch(e) { return []; }
+}
+function saveComments(bookId, comments) { localStorage.setItem('novel_comments_' + bookId, JSON.stringify(comments)); }
+
+function postComment() {
+  if (!App.user) { showAuthModal('login'); return; }
+  const textarea = document.getElementById('comment-input');
+  const text = textarea.value.trim();
+  if (!text) return;
+  const bookId = App.currentBookId;
+  const comments = getComments(bookId);
+  comments.unshift({ username: App.user.username, text, createdAt: Date.now(), id: 'c' + Date.now() });
+  saveComments(bookId, comments);
+  textarea.value = '';
+  renderComments(bookId);
+}
+
+function renderComments(bookId) {
+  const comments = getComments(bookId);
+  let html = '<div class="comments-header">💬 读者评论 (' + comments.length + ')</div>';
+  if (App.user) {
+    html += `<div class="comment-form"><textarea id="comment-input" placeholder="写下你的评论..."></textarea><button class="comment-submit" onclick="postComment()">发表</button></div>`;
+  } else {
+    html += '<p style="font-size:12px;color:var(--text2);margin-bottom:12px">请<a style="color:var(--accent);cursor:pointer;text-decoration:underline" onclick="showAuthModal(\'login\')">登录</a>后发表评论</p>';
+  }
+  if (comments.length === 0) {
+    html += '<p style="color:var(--text2);font-size:13px;text-align:center;padding:20px 0">暂无评论，来说两句吧</p>';
+  } else {
+    html += '<div class="comment-list">';
+    comments.forEach(c => {
+      const d = new Date(c.createdAt);
+      const timeStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      html += `<div class="comment-item"><div class="comment-user">${c.username}</div><div class="comment-text">${c.text}</div><div class="comment-time">${timeStr}</div></div>`;
+    });
+    html += '</div>';
+  }
+  document.getElementById('comments-section').innerHTML = html;
+}
+
+// ==================== Ratings ====================
+function getRatings(bookId) {
+  try { return JSON.parse(localStorage.getItem('novel_ratings_' + bookId)) || {}; } catch(e) { return {}; }
+}
+function saveRatings(bookId, ratings) { localStorage.setItem('novel_ratings_' + bookId, JSON.stringify(ratings)); }
+
+function getAvgRating(bookId) {
+  const ratings = getRatings(bookId);
+  const scores = Object.values(ratings);
+  if (scores.length === 0) return 0;
+  return Math.round((scores.reduce((a,b) => a + b, 0) / scores.length) * 10) / 10;
+}
+
+function getRatingCount(bookId) {
+  return Object.keys(getRatings(bookId)).length;
+}
+
+function getUserRating(bookId) {
+  if (!App.user) return null;
+  const ratings = getRatings(bookId);
+  return ratings[App.user.username] || null;
+}
+
+function submitRating(bookId, score) {
+  if (!App.user) { showAuthModal('login'); return; }
+  const ratings = getRatings(bookId);
+  ratings[App.user.username] = score;
+  saveRatings(bookId, ratings);
+  renderRating(bookId);
+  renderBookGrid();
+}
+
+function renderRating(bookId) {
+  const avg = getAvgRating(bookId);
+  const count = getRatingCount(bookId);
+  const myScore = getUserRating(bookId);
+
+  let html = '<div class="rating-header">⭐ 小说评分</div>';
+  html += '<div class="rating-current">综合评分：<b style="color:var(--star);font-size:18px">' + (avg > 0 ? avg.toFixed(1) : '暂无') + '</b> / 10 （' + count + '人评分）';
+  if (myScore) html += ' &nbsp;你的评分：<b style="color:var(--accent)">' + myScore + '</b>';
+  html += '</div>';
+
+  if (App.user) {
+    html += '<div class="rating-stars">';
+    for (let i = 1; i <= 10; i++) {
+      html += '<button class="rating-star' + (myScore === i ? ' my-score' : '') + '" onclick="submitRating(\'' + bookId + '\',' + i + ')">' + i + '</button>';
+    }
+    html += '</div>';
+  } else {
+    html += '<p style="font-size:12px;color:var(--text2)">请<a style="color:var(--accent);cursor:pointer;text-decoration:underline" onclick="showAuthModal(\'login\')">登录</a>后评分</p>';
+  }
+  document.getElementById('rating-section').innerHTML = html;
+}
+
+// ==================== App state ====================
+let App = {
+  currentBookId: null, currentChapterIdx: 0, sidebarCollapsed: false,
+  currentCategory: '全部', searchQuery: '',
+  settings: { fontSize:17, lineHeight:2.0, theme:'light', fontFamily:'song' },
+  bookmarks: {}, user: null,
+};
+
+// ==================== Auth ====================
+function getUsers(){try{return JSON.parse(localStorage.getItem('novel_users'))||{};}catch(e){return{};}}
+function saveUsers(u){localStorage.setItem('novel_users',JSON.stringify(u));}
+function getCurrentUser(){try{return JSON.parse(localStorage.getItem('novel_cur_user'));}catch(e){return null;}}
+
+function showAuthModal(type){
+  closeAllModals();
+  document.getElementById('modal-overlay').classList.add('show');
+  if(type==='login'){
+    document.getElementById('modal-login').classList.add('show');
+    document.getElementById('login-error').textContent='';
+    document.getElementById('login-username').value='';
+    document.getElementById('login-password').value='';
+    setTimeout(()=>document.getElementById('login-username').focus(),100);
+  }else{
+    document.getElementById('modal-register').classList.add('show');
+    document.getElementById('reg-error').textContent='';
+    document.getElementById('reg-username').value='';
+    document.getElementById('reg-password').value='';
+    document.getElementById('reg-password2').value='';
+    setTimeout(()=>document.getElementById('reg-username').focus(),100);
+  }
+}
+
+async function doRegister(){
+  const uname=document.getElementById('reg-username').value.trim();
+  const pw=document.getElementById('reg-password').value;
+  const pw2=document.getElementById('reg-password2').value;
+  const errEl=document.getElementById('reg-error');
+  if(!/^[\w一-鿿]{3,16}$/u.test(uname)){errEl.textContent='用户名需3-16位（字母、数字、下划线、中文）';return;}
+  if(pw.length<6){errEl.textContent='密码至少6位';return;}
+  if(/[一-鿿]/.test(pw)){errEl.textContent='密码不能包含中文';return;}
+  if(pw!==pw2){errEl.textContent='两次密码不一致';return;}
+  const users=getUsers();
+  if(users[uname]){errEl.textContent='用户名已存在';return;}
+  users[uname]={password:await sha256(pw),createdAt:Date.now()};
+  saveUsers(users);
+  migrateGuestData(uname);
+  loginAs(uname);
+  closeAllModals();
+}
+
+async function doLogin(){
+  const uname=document.getElementById('login-username').value.trim();
+  const pw=document.getElementById('login-password').value;
+  const errEl=document.getElementById('login-error');
+  if(!uname){errEl.textContent='请输入用户名';return;}
+  const users=getUsers();
+  if(!users[uname]){errEl.textContent='用户名不存在';return;}
+  if(users[uname].password!==await sha256(pw)){errEl.textContent='密码错误';return;}
+  migrateGuestData(uname);
+  loginAs(uname);
+  closeAllModals();
+}
+
+function loginAs(username){
+  App.user={username};
+  localStorage.setItem('novel_cur_user',JSON.stringify(App.user));
+  const ukey='novel_bookmarks_'+username;
+  const pkey='novel_lastpos_'+username;
+  try{App.bookmarks=JSON.parse(localStorage.getItem(ukey))||{};}catch(e){App.bookmarks={};}
+  const saved=(()=>{try{return JSON.parse(localStorage.getItem(pkey));}catch(e){return null;}})();
+  if(saved){App.currentBookId=saved.bookId;App.currentChapterIdx=saved.chapterIdx;}
+  updateAuthUI();
+  renderBookshelf();
+  if(App.currentBookId&&document.getElementById('reader').classList.contains('active')){
+    openReader(App.currentBookId,App.currentChapterIdx);
+  }
+}
+
+function logout(){
+  App.user=null;
+  localStorage.removeItem('novel_cur_user');
+  App.bookmarks={};
+  try{App.bookmarks=JSON.parse(localStorage.getItem('novel_bookmarks_guest'))||{};}catch(e){App.bookmarks={};}
+  try{const pos=JSON.parse(localStorage.getItem('novel_lastpos_guest'));if(pos){App.currentBookId=pos.bookId;App.currentChapterIdx=pos.chapterIdx;}}catch(e){}
+  document.getElementById('user-menu').classList.remove('show');
+  updateAuthUI();
+  renderBookshelf();
+}
+
+function migrateGuestData(username){
+  const guestBm=localStorage.getItem('novel_bookmarks_guest');
+  const guestPos=localStorage.getItem('novel_lastpos_guest');
+  if(guestBm){localStorage.setItem('novel_bookmarks_'+username,guestBm);localStorage.removeItem('novel_bookmarks_guest');}
+  if(guestPos){localStorage.setItem('novel_lastpos_'+username,guestPos);localStorage.removeItem('novel_lastpos_guest');}
+}
+
+function updateAuthUI(){
+  if(App.user){
+    document.getElementById('btn-login').style.display='none';
+    document.getElementById('btn-register').style.display='none';
+    document.getElementById('user-dropdown').style.display='';
+    document.getElementById('username-display').textContent=App.user.username;
+  }else{
+    document.getElementById('btn-login').style.display='';
+    document.getElementById('btn-register').style.display='';
+    document.getElementById('user-dropdown').style.display='none';
+  }
+}
+
+function toggleUserMenu(){document.getElementById('user-menu').classList.toggle('show');}
+document.addEventListener('click',function(e){if(!e.target.closest('#user-dropdown'))document.getElementById('user-menu').classList.remove('show');});
+
+// ==================== Storage helpers ====================
+function storageKey(prefix){return App.user?prefix+'_'+App.user.username:prefix+'_guest';}
+
+// ==================== Bookmarks ====================
+function loadBookmarks(){try{App.bookmarks=JSON.parse(localStorage.getItem(storageKey('novel_bookmarks')))||{};}catch(e){App.bookmarks={};}}
+function saveBookmarks(){localStorage.setItem(storageKey('novel_bookmarks'),JSON.stringify(App.bookmarks));}
+function getBmKey(bookId,chIdx){return bookId+'-'+chIdx;}
+function toggleBookmark(){
+  if(!App.currentBookId)return;
+  const key=getBmKey(App.currentBookId,App.currentChapterIdx);
+  if(App.bookmarks[key]){delete App.bookmarks[key];saveBookmarks();renderBookmarkPanel();renderBookmarksMini();}
+  else{
+    const allNovels=getAllNovels();const book=allNovels.find(n=>n.id===App.currentBookId);
+    const ch=book.chapters[App.currentChapterIdx];
+    App.bookmarks[key]={bookId:App.currentBookId,chapterIdx:App.currentChapterIdx,chapterTitle:ch.title,bookTitle:book.title,time:new Date().toLocaleString('zh-CN')};
+    saveBookmarks();renderBookmarkPanel();renderBookmarksMini();
+    document.getElementById('btn-bookmark').textContent='🔖 已添加书签';
+    setTimeout(()=>{document.getElementById('btn-bookmark').textContent='🔖 添加书签';},1500);
+  }
+}
+
+// ==================== Reading position ====================
+function saveLastPosition(){if(!App.currentBookId)return;localStorage.setItem(storageKey('novel_lastpos'),JSON.stringify({bookId:App.currentBookId,chapterIdx:App.currentChapterIdx}));}
+function getLastPosition(){try{return JSON.parse(localStorage.getItem(storageKey('novel_lastpos')));}catch(e){return null;}}
+
+// ==================== Bookshelf rendering ====================
+function onSearch(){App.searchQuery=document.getElementById('search-input').value.trim().toLowerCase();renderBookGrid();}
+function filterCategory(cat){App.currentCategory=cat;renderBookshelf();}
+
+function getFilteredBooks(){
+  let books=getAllNovels();
+  if(App.currentCategory==='推荐'){
+    books=books.filter(b=>getAvgRating(b.id)>=7).sort((a,b)=>getAvgRating(b.id)-getAvgRating(a.id));
+    if(App.searchQuery){const q=App.searchQuery;books=books.filter(b=>b.title.toLowerCase().includes(q)||b.author.toLowerCase().includes(q)||b.desc.toLowerCase().includes(q));}
+    return books;
+  }
+  if(App.currentCategory!=='全部'){books=books.filter(b=>b.category===CAT_MAP[App.currentCategory]);}
+  if(App.searchQuery){const q=App.searchQuery;books=books.filter(b=>b.title.toLowerCase().includes(q)||b.author.toLowerCase().includes(q)||b.desc.toLowerCase().includes(q));}
+  return books;
+}
+
+function highlightText(text,query){if(!query)return text;const re=new RegExp('('+query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');return text.replace(re,'<mark>$1</mark>');}
+
+function renderBookshelf(){
+  let catHtml='';
+  CATEGORIES.forEach(c=>{catHtml+='<button class="cat-tab'+(App.currentCategory===c?' active':'')+'" onclick="filterCategory(\''+c+'\')">'+c+'</button>';});
+  document.getElementById('category-tabs').innerHTML=catHtml;
+  renderRecommended();
+  renderBookGrid();
+}
+
+function renderRecommended(){
+  const section=document.getElementById('recommended-section');
+  // Only show recommended on "全部" tab, not when searching
+  if(App.currentCategory!=='全部'||App.searchQuery){section.style.display='none';return;}
+  const books=getAllNovels().filter(b=>getAvgRating(b.id)>=7).sort((a,b)=>getAvgRating(b.id)-getRatingCount(b.id));
+  if(books.length===0){section.style.display='none';return;}
+  section.style.display='';
+  let html='<div class="rec-header"><span class="rec-icon">⭐</span> 推荐好书 · 高分精选</div><div class="rec-scroll">';
+  books.forEach((book,i)=>{
+    const avg=getAvgRating(book.id);
+    const rCount=getRatingCount(book.id);
+    const coverGrad=book.cover||COVER_GRADIENTS[book.category]||'linear-gradient(135deg,#555,#777)';
+    const coverEmoji=book.emoji||COVER_EMOJI[book.category]||'📖';
+    const catName=Object.entries(CAT_MAP).find(([k,v])=>v===book.category)?.[0]||book.category;
+    html+='<div class="rec-card" onclick="openReader(\''+book.id+'\',0)">'+
+      '<div class="rec-cover" style="background:'+coverGrad+'"><span class="rec-rank">'+(i+1)+'</span><span class="rec-cover-text">'+coverEmoji+'<br>'+book.title+'</span><span class="rec-score">⭐'+avg.toFixed(1)+' ('+rCount+'评)</span></div>'+
+      '<div class="rec-info"><h3>'+book.title+'</h3><div class="rec-meta">'+book.author+' · '+catName+' · '+book.chapters.length+'章</div></div></div>';
+  });
+  html+='</div>';
+  section.innerHTML=html;
+}
+
+function renderBookGrid(){
+  const books=getFilteredBooks();
+  const grid=document.getElementById('book-grid');
+  const noRes=document.getElementById('no-results');
+  if(books.length===0){grid.innerHTML='';noRes.style.display='block';return;}
+  noRes.style.display='none';
+  const pos=getLastPosition();
+  let html='';
+  books.forEach(book=>{
+    const progress=(pos&&pos.bookId===book.id)?Math.round((pos.chapterIdx+1)/book.chapters.length*100):0;
+    const titleHl=highlightText(book.title,App.searchQuery);
+    const authorHl=highlightText(book.author,App.searchQuery);
+    const descHl=highlightText(book.desc||'',App.searchQuery);
+    const catName=Object.entries(CAT_MAP).find(([k,v])=>v===book.category)?.[0]||book.category;
+    const avg=getAvgRating(book.id);
+    const rCount=getRatingCount(book.id);
+    const coverGrad=book.cover||COVER_GRADIENTS[book.category]||'linear-gradient(135deg,#555,#777)';
+    const coverEmoji=book.emoji||COVER_EMOJI[book.category]||'📖';
+    html+='<div class="book-card" onclick="openReader(\''+book.id+'\','+(progress>0&&pos?.bookId===book.id?pos.chapterIdx:0)+')">'+
+      '<div class="book-cover" style="background:'+coverGrad+'"><span class="cover-text">'+coverEmoji+'<br>'+book.title+'</span>'+
+      '<span class="cat-badge">'+catName+'</span>'+
+      (book.isUploaded?'<span class="upload-badge">用户投稿</span>':'')+
+      (avg>0?'<div class="rating-badge"><span class="rating-num">'+avg.toFixed(1)+'</span> 分 <span class="rating-count">('+rCount+'评)</span></div>':'')+
+      (book.isUploaded && App.user && App.user.username === book.uploadedBy ? '<div class="author-actions" onclick="event.stopPropagation()"><button class="aa-btn aa-edit" onclick="editNovel(\''+book.id+'\')">✎ 编辑</button><button class="aa-btn aa-del" onclick="deleteNovel(\''+book.id+'\')">✕ 删除</button></div>' : '')+
+      '</div>'+
+      '<div class="book-info"><h3>'+titleHl+'</h3><div class="author">'+authorHl+' 著 · '+book.chapters.length+'章</div><div class="desc">'+descHl+'</div>'+
+      (progress>0?'<div class="progress-bar"><div class="fill" style="width:'+progress+'%"></div></div><div class="progress-label">已读 '+progress+'%</div>':'')+
+      '</div></div>';
+  });
+  grid.innerHTML=html;
+}
+
+// ==================== Reader ====================
+function openReader(bookId,chapterIdx){
+  const allNovels=getAllNovels();const book=allNovels.find(n=>n.id===bookId);
+  if(!book)return;
+  App.currentBookId=bookId;App.currentChapterIdx=chapterIdx;
+  document.getElementById('bookshelf').classList.add('hidden');
+  document.getElementById('reader').classList.add('active');
+  document.getElementById('float-toolbar').style.display='flex';
+  document.getElementById('btn-toc').style.display='';
+  document.getElementById('btn-bm').style.display='';
+  renderChapterList(book);renderChapterContent(book,chapterIdx);
+  renderBookmarksMini();renderComments(bookId);renderRating(bookId);renderErrataPanel(bookId);
+  saveLastPosition();applyTheme();
+  document.getElementById('content-area').scrollTo(0,0);
+}
+
+function goBookshelf(){
+  document.getElementById('reader').classList.remove('active');
+  document.getElementById('bookshelf').classList.remove('hidden');
+  document.getElementById('float-toolbar').style.display='none';
+  document.getElementById('btn-toc').style.display='none';
+  document.getElementById('btn-bm').style.display='none';
+  App.currentBookId=null;renderBookshelf();
+}
+
+function renderChapterList(book){
+  document.getElementById('chapter-list').innerHTML=book.chapters.map((ch,i)=>
+    '<div class="chapter-item'+(i===App.currentChapterIdx?' current':'')+'" onclick="jumpToChapter('+i+')"><span class="ch-num">第'+(i+1)+'章</span>'+ch.title.replace(/第[一二三四五六七八九十\d]+章\s*/,'')+'</div>'
+  ).join('');
+}
+
+function jumpToChapter(idx){
+  const allNovels=getAllNovels();const book=allNovels.find(n=>n.id===App.currentBookId);
+  if(!book||idx<0||idx>=book.chapters.length)return;
+  App.currentChapterIdx=idx;renderChapterList(book);renderChapterContent(book,idx);
+  saveLastPosition();document.getElementById('content-area').scrollTo(0,0);
+  if(window.innerWidth<=768){App.sidebarCollapsed=true;updateSidebar();}
+}
+
+function prevChapter(){jumpToChapter(App.currentChapterIdx-1);}
+function nextChapter(){jumpToChapter(App.currentChapterIdx+1);}
+
+function renderChapterContent(book,chapterIdx){
+  const ch=book.chapters[chapterIdx];
+  document.getElementById('curr-book-title').textContent=book.title;
+  document.getElementById('curr-chap-title').textContent=ch.title;
+  document.getElementById('btn-prev').disabled=chapterIdx===0;
+  document.getElementById('btn-next').disabled=chapterIdx===book.chapters.length-1;
+  const hasBm=!!App.bookmarks[getBmKey(book.id,chapterIdx)];
+  document.getElementById('btn-bookmark').textContent=hasBm?'🔖 已添加书签':'🔖 添加书签';
+  document.getElementById('content-body').innerHTML='<h1 class="chapter-heading">'+ch.title+'</h1><div class="chapter-text">'+ch.content.map(p=>'<p>'+p+'</p>').join('')+'</div>';
+}
+
+function toggleSidebar(){App.sidebarCollapsed=!App.sidebarCollapsed;updateSidebar();}
+function updateSidebar(){document.getElementById('sidebar').classList.toggle('collapsed',App.sidebarCollapsed);}
+
+function renderBookmarksMini(){
+  const bms=Object.values(App.bookmarks).filter(b=>b.bookId===App.currentBookId);
+  document.getElementById('bookmarks-mini').innerHTML=bms.length===0
+    ?'<h4>本书书签</h4><p style="font-size:11px;color:var(--text2)">暂无书签</p>'
+    :'<h4>本书书签</h4>'+bms.map(b=>'<div class="bm-mini-item" onclick="jumpToChapter('+b.chapterIdx+')">📑 '+b.chapterTitle+'</div>').join('');
+}
+
+function showBookmarks(){renderBookmarkPanel();document.getElementById('bookmark-panel').classList.add('show');document.getElementById('modal-overlay').classList.add('show');}
+function renderBookmarkPanel(){
+  const bms=Object.values(App.bookmarks);
+  if(bms.length===0){document.getElementById('bookmark-list').innerHTML='<p style="color:var(--text2);font-size:13px;text-align:center">暂无书签</p>';return;}
+  bms.sort((a,b)=>new Date(b.time)-new Date(a.time));
+  document.getElementById('bookmark-list').innerHTML=bms.map(b=>'<div class="bm-item" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--divider)"><div style="flex:1;cursor:pointer" onclick="jumpToBookmark(\''+b.bookId+'\','+b.chapterIdx+')"><div style="font-size:13px;color:var(--text)">📑 '+b.bookTitle+' — '+b.chapterTitle+'</div><div style="font-size:10px;color:var(--text2)">'+b.time+'</div></div><button style="background:none;border:none;color:#c0392b;cursor:pointer;font-size:16px;padding:4px" onclick="event.stopPropagation();deleteBookmark(\''+getBmKey(b.bookId,b.chapterIdx)+'\')">✕</button></div>').join('');
+}
+function jumpToBookmark(bookId,chapterIdx){closeAllModals();if(App.currentBookId!==bookId)openReader(bookId,chapterIdx);else jumpToChapter(chapterIdx);}
+function deleteBookmark(key){delete App.bookmarks[key];saveBookmarks();renderBookmarkPanel();renderBookmarksMini();if(App.currentBookId)renderChapterContent(getAllNovels().find(n=>n.id===App.currentBookId),App.currentChapterIdx);}
+
+// ==================== Settings ====================
+function loadSettings(){try{const s=JSON.parse(localStorage.getItem('novel_settings'));if(s)App.settings={...App.settings,...s};}catch(e){}}
+function saveSettings(){localStorage.setItem('novel_settings',JSON.stringify(App.settings));}
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme',App.settings.theme);
+  const ca=document.getElementById('content-area');if(ca){ca.style.setProperty('--font-size',App.settings.fontSize+'px');ca.style.setProperty('--line-height',App.settings.lineHeight);}
+  const fm={song:"'STSong','Songti SC','SimSun',serif",hei:"'PingFang SC','Microsoft YaHei','SimHei',sans-serif",kai:"'KaiTi','STKaiti','楷体',serif"};
+  document.body.style.fontFamily=fm[App.settings.fontFamily]||fm.song;
+}
+
+function showSettings(){
+  closeAllModals();document.getElementById('modal-overlay').classList.add('show');
+  document.getElementById('settings-panel').classList.add('show');renderSettingsUI();
+}
+function renderSettingsUI(){
+  const opts=[
+    {id:'font-size-opts',vals:[{v:15,l:'小'},{v:17,l:'中'},{v:20,l:'大'},{v:24,l:'超大'}],cur:App.settings.fontSize},
+    {id:'theme-opts',vals:[{v:'light',l:'白天'},{v:'dark',l:'夜间'},{v:'eye',l:'护眼'}],cur:App.settings.theme},
+    {id:'line-height-opts',vals:[{v:1.6,l:'紧凑'},{v:2.0,l:'标准'},{v:2.4,l:'宽松'}],cur:App.settings.lineHeight},
+    {id:'font-family-opts',vals:[{v:'song',l:'宋体'},{v:'hei',l:'黑体'},{v:'kai',l:'楷体'}],cur:App.settings.fontFamily},
+  ];
+  opts.forEach(o=>{document.getElementById(o.id).innerHTML=o.vals.map(v=>'<button class="setting-opt'+(v.v===o.cur?' selected':'')+'" data-val="'+v.v+'">'+v.l+'</button>').join('');});
+}
+
+document.addEventListener('click',function(e){
+  if(e.target.classList.contains('setting-opt')&&e.target.closest('#settings-panel')){
+    const opt=e.target;const parent=opt.parentElement;
+    parent.querySelectorAll('.setting-opt').forEach(b=>b.classList.remove('selected'));
+    opt.classList.add('selected');const val=opt.dataset.val;
+    if(parent.id==='font-size-opts')App.settings.fontSize=parseInt(val);
+    else if(parent.id==='theme-opts')App.settings.theme=val;
+    else if(parent.id==='line-height-opts')App.settings.lineHeight=parseFloat(val);
+    else if(parent.id==='font-family-opts')App.settings.fontFamily=val;
+    saveSettings();applyTheme();
+  }
+});
+
+function closeAllModals(){
+  document.getElementById('modal-overlay').classList.remove('show');
+  ['modal-login','modal-register','settings-panel','bookmark-panel','modal-upload','modal-errata'].forEach(id=>document.getElementById(id).classList.remove('show'));
+}
+
+// ==================== Events ====================
+document.getElementById('content-area').addEventListener('scroll',function(){document.getElementById('back-top').style.display=this.scrollTop>400?'flex':'none';});
+document.addEventListener('keydown',e=>{
+  if(document.activeElement.tagName==='INPUT'||document.activeElement.tagName==='TEXTAREA')return;
+  if(!App.currentBookId)return;
+  if(e.key==='ArrowLeft')prevChapter();
+  if(e.key==='ArrowRight')nextChapter();
+  if(e.key==='Escape')closeAllModals();
+});
+
+// Auth enter key support
+['login-username','login-password','reg-username','reg-password','reg-password2'].forEach((id,i)=>{
+  document.getElementById(id).addEventListener('keydown',e=>{
+    if(e.key==='Enter'){
+      if(id==='login-username')document.getElementById('login-password').focus();
+      else if(id==='login-password')doLogin();
+      else if(id==='reg-username')document.getElementById('reg-password').focus();
+      else if(id==='reg-password')document.getElementById('reg-password2').focus();
+      else if(id==='reg-password2')doRegister();
+    }
+  });
+});
+
+// ==================== Init ====================
+function init(){
+  loadSettings();
+  const cu=getCurrentUser();
+  if(cu){App.user=cu;loadBookmarks();const pos=getLastPosition();if(pos){App.currentBookId=pos.bookId;App.currentChapterIdx=pos.chapterIdx;}}
+  else{App.user=null;loadBookmarks();const pos=getLastPosition();if(pos){App.currentBookId=pos.bookId;App.currentChapterIdx=pos.chapterIdx;}}
+  updateAuthUI();renderBookshelf();applyTheme();
+  if(App.currentBookId){openReader(App.currentBookId,App.currentChapterIdx);}
+}
+init();
+</script>
+</body>
+</html>
