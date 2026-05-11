@@ -320,7 +320,7 @@ mark { background: #ffe082; color: #333; padding: 0 1px; border-radius: 2px; }
   <div class="form-group"><label>书名 *</label><input type="text" id="up-title" placeholder="请输入小说书名"></div>
   <div class="form-group"><label>作者笔名 *</label><input type="text" id="up-author" placeholder="请输入作者笔名"></div>
   <div class="form-group"><label>分类 *</label>
-    <select id="up-category"><option value="scifi">科幻</option><option value="romance">言情</option><option value="wuxia">武侠</option><option value="mystery">悬疑</option><option value="history">历史</option></select></div>
+    <select id="up-category"><option value="scifi">科幻</option><option value="romance">言情</option><option value="wuxia">武侠</option><option value="mystery">悬疑</option><option value="history">历史</option><option value="fantasy">奇幻</option><option value="urban">都市</option><option value="horror">灵异</option><option value="gaming">游戏</option><option value="military">军事</option></select></div>
   <div class="form-group"><label>简介</label><textarea id="up-desc" placeholder="简单介绍一下这部小说..." rows="2"></textarea></div>
   <div class="form-group"><label>章节内容 *（至少一章）</label>
     <div id="chapter-editors">
@@ -665,9 +665,9 @@ function renderErrataPanel(bookId) {
       const d = new Date(er.createdAt);
       const timeStr = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
       html += '<div class="errata-item">';
-      html += '<div class="errata-meta">' + er.username + ' · ' + er.chapterTitle + ' · ' + timeStr + ' <span class="errata-status ' + er.status + '">' + (er.status==='open'?'待处理':'已修复') + '</span></div>';
-      html += '<div class="errata-desc">' + er.description + '</div>';
-      if (er.suggestion) html += '<div class="errata-suggestion">💡 建议：' + er.suggestion + '</div>';
+      html += '<div class="errata-meta">' + escapeHtml(er.username) + ' · ' + escapeHtml(er.chapterTitle) + ' · ' + timeStr + ' <span class="errata-status ' + er.status + '">' + (er.status==='open'?'待处理':'已修复') + '</span></div>';
+      html += '<div class="errata-desc">' + escapeHtml(er.description) + '</div>';
+      if (er.suggestion) html += '<div class="errata-suggestion">💡 建议：' + escapeHtml(er.suggestion) + '</div>';
       if (isAuthor) {
         html += '<div class="errata-actions"><button class="top-btn" style="font-size:10px;padding:2px 8px" onclick="markErrataFixed(\''+bookId+'\',\''+er.id+'\',event)">' + (er.status==='open'?'✓ 标记已修复':'↩ 重新打开') + '</button><button class="top-btn" style="font-size:10px;padding:2px 8px;color:#c0392b" onclick="deleteErrata(\''+bookId+'\',\''+er.id+'\',event)">删除</button></div>';
       }
@@ -709,7 +709,7 @@ function renderComments(bookId) {
     comments.forEach(c => {
       const d = new Date(c.createdAt);
       const timeStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
-      html += `<div class="comment-item"><div class="comment-user">${c.username}</div><div class="comment-text">${c.text}</div><div class="comment-time">${timeStr}</div></div>`;
+      html += '<div class="comment-item"><div class="comment-user">'+escapeHtml(c.username)+'</div><div class="comment-text">'+escapeHtml(c.text)+'</div><div class="comment-time">'+timeStr+'</div></div>';
     });
     html += '</div>';
   }
@@ -923,7 +923,8 @@ function getFilteredBooks(){
   return books;
 }
 
-function highlightText(text,query){if(!query)return text;const re=new RegExp('('+query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');return text.replace(re,'<mark>$1</mark>');}
+function escapeHtml(str){return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function highlightText(text,query){if(!query)return escapeHtml(text);const esc=escapeHtml(text);const re=new RegExp('('+query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');return esc.replace(re,'<mark>$1</mark>');}
 
 function renderBookshelf(){
   let catHtml='';
@@ -937,7 +938,7 @@ function renderRecommended(){
   const section=document.getElementById('recommended-section');
   // Only show recommended on "全部" tab, not when searching
   if(App.currentCategory!=='全部'||App.searchQuery){section.style.display='none';return;}
-  const books=getAllNovels().filter(b=>getAvgRating(b.id)>=7).sort((a,b)=>getAvgRating(b.id)-getRatingCount(b.id));
+  const books=getAllNovels().filter(b=>getAvgRating(b.id)>=7).sort((a,b)=>getAvgRating(b.id)-getAvgRating(a.id)||getRatingCount(b.id)-getRatingCount(a.id));
   if(books.length===0){section.style.display='none';return;}
   section.style.display='';
   let html='<div class="rec-header"><span class="rec-icon">⭐</span> 推荐好书 · 高分精选</div><div class="rec-scroll">';
@@ -948,8 +949,8 @@ function renderRecommended(){
     const coverEmoji=book.emoji||COVER_EMOJI[book.category]||'📖';
     const catName=Object.entries(CAT_MAP).find(([k,v])=>v===book.category)?.[0]||book.category;
     html+='<div class="rec-card" onclick="openReader(\''+book.id+'\',0)">'+
-      '<div class="rec-cover" style="background:'+coverGrad+'"><span class="rec-rank">'+(i+1)+'</span><span class="rec-cover-text">'+coverEmoji+'<br>'+book.title+'</span><span class="rec-score">⭐'+avg.toFixed(1)+' ('+rCount+'评)</span></div>'+
-      '<div class="rec-info"><h3>'+book.title+'</h3><div class="rec-meta">'+book.author+' · '+catName+' · '+book.chapters.length+'章</div></div></div>';
+      '<div class="rec-cover" style="background:'+coverGrad+'"><span class="rec-rank">'+(i+1)+'</span><span class="rec-cover-text">'+coverEmoji+'<br>'+escapeHtml(book.title)+'</span><span class="rec-score">⭐'+avg.toFixed(1)+' ('+rCount+'评)</span></div>'+
+      '<div class="rec-info"><h3>'+escapeHtml(book.title)+'</h3><div class="rec-meta">'+escapeHtml(book.author)+' · '+catName+' · '+book.chapters.length+'章</div></div></div>';
   });
   html+='</div>';
   section.innerHTML=html;
