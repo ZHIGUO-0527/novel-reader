@@ -977,6 +977,13 @@ function updateAuthUI(){
 function toggleUserMenu(){document.getElementById('user-menu').classList.toggle('show');}
 document.addEventListener('click',function(e){if(!e.target.closest('#user-dropdown'))document.getElementById('user-menu').classList.remove('show');});
 
+
+// ==================== Bookshelf (favorites) ====================
+function getBookshelfData(){const k=App.user?'novel_bookshelf_'+App.user.username:'novel_bookshelf_guest';try{return JSON.parse(localStorage.getItem(k))||[];}catch(e){return[];}}
+function saveBookshelfData(d){const k=App.user?'novel_bookshelf_'+App.user.username:'novel_bookshelf_guest';localStorage.setItem(k,JSON.stringify(d));}
+function isOnBookshelf(bId){return getBookshelfData().includes(bId);}
+function toggleBookshelfItem(bId,e){if(e)e.stopPropagation();if(!App.user){showAuthModal('login');return;}const s=getBookshelfData();const i=s.indexOf(bId);if(i>=0)s.splice(i,1);else s.push(bId);saveBookshelfData(s);if(document.getElementById('my-page').classList.contains('show'))renderMyBookshelfTab();else{renderRecScroll();renderNewScroll();}if(App.currentBookId===bId&&document.getElementById('reader').classList.contains('active')){const b=getAllNovels().find(n=>n.id===bId);renderChapterContent(b,App.currentChapterIdx);}}
+
 // ==================== Storage helpers ====================
 function storageKey(prefix){return App.user?prefix+'_'+App.user.username:prefix+'_guest';}
 
