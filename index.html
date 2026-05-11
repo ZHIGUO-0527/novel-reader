@@ -3,265 +3,270 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>云中书阁 - 小说阅读</title>
+<title>云中书阁 - 在线书城</title>
 <style>
 :root {
-  --bg: #f5f0e8; --bg2: #ede4d3; --text: #3d3226; --text2: #6b5d4f;
-  --accent: #8b5e3c; --accent2: #c4956a; --card: #fffaf2; --cardBorder: #e0d5c0;
-  --sidebar: #faf6ef; --divider: #e0d5c0; --hover: #f0e8d8;
-  --shadow: rgba(0,0,0,0.06); --selection: #d4c4a8; --star: #f0c040;
+  --bg:#f5f0e8;--bg2:#ede4d3;--text:#3d3226;--text2:#6b5d4f;
+  --accent:#8b5e3c;--accent2:#c4956a;--card:#fffaf2;--cardBorder:#e0d5c0;
+  --sidebar:#faf6ef;--divider:#e0d5c0;--hover:#f0e8d8;
+  --shadow:rgba(0,0,0,0.06);--selection:#d4c4a8;--star:#f0c040;
+  --banner1:#0c1445;--banner2:#1a3a6c;
 }
 :root[data-theme="dark"] {
-  --bg: #1a1a1e; --bg2: #222228; --text: #d0d0d0; --text2: #999;
-  --accent: #c4956a; --accent2: #d4a87c; --card: #252530; --cardBorder: #333;
-  --sidebar: #1e1e24; --divider: #333; --hover: #2a2a35;
-  --shadow: rgba(0,0,0,0.3); --selection: #4a4030; --star: #e0b830;
+  --bg:#1a1a1e;--bg2:#222228;--text:#d0d0d0;--text2:#999;
+  --accent:#c4956a;--accent2:#d4a87c;--card:#252530;--cardBorder:#333;
+  --sidebar:#1e1e24;--divider:#333;--hover:#2a2a35;
+  --shadow:rgba(0,0,0,0.3);--selection:#4a4030;--star:#e0b830;
 }
 :root[data-theme="eye"] {
-  --bg: #e8f0e0; --bg2: #d8e8ce; --text: #3a4a32; --text2: #5a6a52;
-  --accent: #6b8a5e; --accent2: #7a9a6e; --card: #f0f6ec; --cardBorder: #c8d8be;
-  --sidebar: #eaf4e4; --divider: #c8d8be; --hover: #dce8d4;
-  --shadow: rgba(0,0,0,0.04); --selection: #c0d4b0; --star: #d4a030;
+  --bg:#e8f0e0;--bg2:#d8e8ce;--text:#3a4a32;--text2:#5a6a52;
+  --accent:#6b8a5e;--accent2:#7a9a6e;--card:#f0f6ec;--cardBorder:#c8d8be;
+  --sidebar:#eaf4e4;--divider:#c8d8be;--hover:#dce8d4;
+  --shadow:rgba(0,0,0,0.04);--selection:#c0d4b0;--star:#d4a030;
 }
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: var(--bg); color: var(--text); font-family: 'STSong','Songti SC','SimSun','KaiTi',serif; min-height: 100vh; transition: background 0.3s, color 0.3s; }
-::selection { background: var(--selection); }
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'STSong','Songti SC','SimSun','KaiTi',serif;min-height:100vh;transition:background .3s,color .3s}
+::selection{background:var(--selection)}
 
-/* ====== Topbar ====== */
-#topbar { position: sticky; top: 0; z-index: 100; background: var(--bg2); border-bottom: 1px solid var(--divider); padding: 0 20px; display: flex; align-items: center; height: 52px; gap: 10px; backdrop-filter: blur(8px); }
-#topbar .logo { font-size: 20px; font-weight: bold; color: var(--accent); cursor: pointer; letter-spacing: 2px; white-space: nowrap; }
-.search-wrap { flex: 1; max-width: 280px; position: relative; }
-.search-wrap input { width: 100%; padding: 7px 12px 7px 32px; border: 1px solid var(--divider); border-radius: 20px; background: var(--card); color: var(--text); font-size: 13px; font-family: inherit; outline: none; transition: border-color 0.2s; }
-.search-wrap input:focus { border-color: var(--accent2); }
-.search-wrap .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 14px; color: var(--text2); pointer-events: none; }
-#topbar .right-btns { display: flex; gap: 6px; align-items: center; }
-.top-btn { background: none; border: 1px solid var(--divider); color: var(--text2); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: all 0.2s; font-family: inherit; white-space: nowrap; }
-.top-btn:hover { background: var(--hover); color: var(--text); border-color: var(--accent2); }
-.top-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-.top-btn.upload-btn { background: #e74c3c; color: #fff; border-color: #e74c3c; }
-.top-btn.upload-btn:hover { background: #c0392b; }
-.user-dropdown { position: relative; }
-.user-dropdown .dropdown-menu { display: none; position: absolute; top: 42px; right: 0; background: var(--card); border: 1px solid var(--cardBorder); border-radius: 8px; min-width: 130px; box-shadow: 0 8px 24px var(--shadow); overflow: hidden; z-index: 60; }
-.user-dropdown .dropdown-menu.show { display: block; }
-.user-dropdown .dropdown-menu .dm-item { padding: 10px 16px; cursor: pointer; font-size: 13px; color: var(--text2); border-bottom: 1px solid var(--divider); transition: background 0.15s; }
-.user-dropdown .dropdown-menu .dm-item:hover { background: var(--hover); color: var(--text); }
-.user-dropdown .dropdown-menu .dm-item:last-child { border-bottom: none; color: #c0392b; }
+/* ====== Nav ====== */
+#topbar{position:sticky;top:0;z-index:100;background:var(--bg2);border-bottom:1px solid var(--divider);padding:0 20px;display:flex;align-items:center;height:52px;gap:12px;backdrop-filter:blur(8px)}
+#topbar .logo{font-size:20px;font-weight:bold;color:var(--accent);cursor:pointer;letter-spacing:2px;white-space:nowrap}
+.search-wrap{flex:1;max-width:360px;position:relative}
+.search-wrap input{width:100%;padding:7px 12px 7px 32px;border:1px solid var(--divider);border-radius:20px;background:var(--card);color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border-color .2s}
+.search-wrap input:focus{border-color:var(--accent2)}
+.search-wrap .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--text2);pointer-events:none}
+.nav-btn{background:none;border:1px solid var(--divider);color:var(--text2);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px;transition:all .2s;font-family:inherit;white-space:nowrap}
+.nav-btn:hover{background:var(--hover);color:var(--text);border-color:var(--accent2)}
+.nav-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.nav-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.nav-btn.upload-btn{background:#e74c3c;color:#fff;border-color:#e74c3c}
+.nav-btn.upload-btn:hover{background:#c0392b}
 
-/* ====== Category tabs ====== */
-#category-tabs { display: flex; gap: 6px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; align-items: center; }
-.cat-tab { padding: 5px 16px; border-radius: 20px; border: 1px solid var(--divider); background: var(--card); color: var(--text2); cursor: pointer; font-size: 13px; font-family: inherit; transition: all 0.2s; }
-.cat-tab:hover { border-color: var(--accent2); color: var(--text); }
-.cat-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+/* ====== Banner ====== */
+#banner{max-width:1100px;margin:24px auto 0;padding:0 24px;position:relative;overflow:hidden;border-radius:16px}
+.banner-track{display:flex;transition:transform .5s ease}
+.banner-slide{min-width:100%;height:280px;display:flex;align-items:center;border-radius:16px;cursor:pointer;position:relative;overflow:hidden}
+.banner-slide .banner-bg{position:absolute;inset:0;opacity:.85}
+.banner-slide .banner-content{position:relative;z-index:1;padding:40px 48px;display:flex;align-items:center;gap:32px;width:100%}
+.banner-slide .banner-cover{width:140px;height:200px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:52px;color:#fff;font-weight:bold;box-shadow:0 8px 32px rgba(0,0,0,.4);flex-shrink:0}
+.banner-slide .banner-info{flex:1;color:#fff}
+.banner-slide .banner-info h2{font-size:30px;margin-bottom:6px;text-shadow:0 2px 8px rgba(0,0,0,.3)}
+.banner-slide .banner-info .banner-author{font-size:14px;opacity:.8;margin-bottom:10px}
+.banner-slide .banner-info .banner-desc{font-size:13px;opacity:.9;line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:14px}
+.banner-slide .banner-info .banner-btn{display:inline-block;padding:8px 24px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);border-radius:20px;color:#fff;font-size:13px;cursor:pointer;transition:all .2s}
+.banner-slide .banner-info .banner-btn:hover{background:rgba(255,255,255,.35)}
+.banner-dots{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:2}
+.banner-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.4);cursor:pointer;transition:all .2s}
+.banner-dot.active{background:#fff;transform:scale(1.3)}
+.banner-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.3);border:none;color:#fff;font-size:20px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.banner-arrow:hover{background:rgba(0,0,0,.5)}
+.banner-arrow.left{left:12px}
+.banner-arrow.right{right:12px}
 
-/* ====== Recommended section ====== */
-.recommended-section { max-width: 1140px; margin: 0 auto 32px; padding: 0 24px; }
-.recommended-section .rec-header { font-size: 20px; font-weight: bold; color: var(--accent); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-.recommended-section .rec-header .rec-icon { font-size: 24px; }
-.rec-scroll { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px; scroll-snap-type: x mandatory; }
-.rec-scroll::-webkit-scrollbar { height: 6px; }
-.rec-scroll::-webkit-scrollbar-thumb { background: var(--divider); border-radius: 3px; }
-.rec-card { min-width: 280px; max-width: 280px; flex-shrink: 0; scroll-snap-align: start; background: var(--card); border: 1px solid var(--cardBorder); border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 2px 8px var(--shadow); position: relative; }
-.rec-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px var(--shadow); }
-.rec-card .rec-cover { height: 140px; display: flex; align-items: center; justify-content: center; font-size: 36px; color: #fff; font-weight: bold; position: relative; }
-.rec-card .rec-cover .rec-cover-text { text-shadow: 0 2px 6px rgba(0,0,0,0.3); writing-mode: vertical-rl; letter-spacing: 2px; }
-.rec-card .rec-cover .rec-rank { position: absolute; top: 8px; left: 8px; width: 28px; height: 28px; border-radius: 50%; background: var(--star); color: #333; font-weight: bold; font-size: 14px; display: flex; align-items: center; justify-content: center; writing-mode: horizontal-tb; }
-.rec-card .rec-info { padding: 12px; }
-.rec-card .rec-info h3 { font-size: 15px; color: var(--text); margin-bottom: 4px; }
-.rec-card .rec-info .rec-meta { font-size: 11px; color: var(--text2); }
-.rec-card .rec-score { position: absolute; bottom: 8px; right: 10px; font-size: 13px; font-weight: bold; color: var(--star); }
+/* ====== Section Headers ====== */
+.section-wrap{max-width:1100px;margin:0 auto;padding:28px 24px}
+.section-title{font-size:20px;font-weight:bold;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.section-title .sec-icon{font-size:22px}
+.section-title .sec-more{font-size:12px;color:var(--text2);cursor:pointer;margin-left:auto;font-weight:normal}
+.section-title .sec-more:hover{color:var(--accent)}
 
-/* ====== Bookshelf ====== */
-#bookshelf { max-width: 1140px; margin: 0 auto; padding: 32px 24px; }
-#bookshelf h1 { text-align: center; font-size: 28px; margin-bottom: 8px; color: var(--text); letter-spacing: 3px; }
-#bookshelf .subtitle { text-align: center; color: var(--text2); margin-bottom: 6px; font-size: 14px; }
-.book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 24px; }
-.no-results { text-align: center; color: var(--text2); padding: 60px 0; font-size: 15px; }
+/* ====== Book cards ====== */
+.book-scroll{display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x mandatory}
+.book-scroll::-webkit-scrollbar{height:5px}
+.book-scroll::-webkit-scrollbar-thumb{background:var(--divider);border-radius:3px}
+.book-card{min-width:160px;max-width:160px;flex-shrink:0;scroll-snap-align:start;background:var(--card);border:1px solid var(--cardBorder);border-radius:10px;overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s;box-shadow:0 2px 6px var(--shadow);position:relative}
+.book-card:hover{transform:translateY(-3px);box-shadow:0 6px 18px var(--shadow)}
+.book-card .card-cover{height:210px;display:flex;align-items:center;justify-content:center;font-size:32px;color:#fff;font-weight:bold;position:relative}
+.book-card .card-cover .cover-emoji{writing-mode:vertical-rl;letter-spacing:2px;line-height:1.4}
+.book-card .card-cover .cover-cat{position:absolute;top:6px;right:6px;padding:1px 7px;border-radius:8px;font-size:9px;background:rgba(255,255,255,.25);color:#fff}
+.book-card .card-cover .cover-rating{position:absolute;bottom:6px;left:6px;padding:2px 6px;border-radius:6px;font-size:10px;background:rgba(0,0,0,.55);color:var(--star);font-weight:bold}
+.book-card .card-info{padding:10px}
+.book-card .card-info h4{font-size:13px;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.book-card .card-info .card-author{font-size:10px;color:var(--text2)}
+.book-card .card-actions{position:absolute;top:6px;left:6px;display:flex;gap:3px}
+.card-fav-btn{width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.45);border:none;color:#fff;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.card-fav-btn:hover{background:rgba(231,76,60,.8);transform:scale(1.15)}
+.card-fav-btn.faved{background:rgba(231,76,60,.85)}
 
-.book-card { background: var(--card); border: 1px solid var(--cardBorder); border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 2px 8px var(--shadow); }
-.book-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px var(--shadow); }
-.book-cover { height: 180px; display: flex; align-items: center; justify-content: center; font-size: 46px; color: #fff; letter-spacing: 4px; font-weight: bold; position: relative; }
-.book-cover .cover-text { text-shadow: 0 2px 8px rgba(0,0,0,0.3); writing-mode: vertical-rl; }
-.book-cover .cat-badge { position: absolute; top: 10px; right: 10px; padding: 2px 10px; border-radius: 10px; font-size: 10px; background: rgba(255,255,255,0.25); color: #fff; letter-spacing: 1px; writing-mode: horizontal-tb; }
-.book-cover .upload-badge { position: absolute; top: 10px; left: 10px; padding: 2px 8px; border-radius: 8px; font-size: 9px; background: rgba(231,76,60,0.85); color: #fff; letter-spacing: 1px; writing-mode: horizontal-tb; }
-.book-cover .rating-badge { position: absolute; bottom: 8px; left: 10px; padding: 3px 10px; border-radius: 10px; font-size: 12px; background: rgba(0,0,0,0.6); color: var(--star); font-weight: bold; writing-mode: horizontal-tb; letter-spacing: 0; }
-.book-cover .rating-badge .rating-num { font-size: 16px; }
-.book-cover .rating-badge .rating-count { font-size: 9px; color: #ccc; }
-.book-info { padding: 16px; }
-.book-info h3 { font-size: 17px; margin-bottom: 4px; color: var(--text); }
-.book-info .author { font-size: 12px; color: var(--text2); margin-bottom: 8px; }
-.book-info .desc { font-size: 12px; color: var(--text2); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.progress-bar { height: 3px; background: var(--divider); border-radius: 2px; margin-top: 10px; }
-.progress-bar .fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s; }
-.progress-label { font-size: 10px; color: var(--text2); margin-top: 3px; text-align: right; }
-mark { background: #ffe082; color: #333; padding: 0 1px; border-radius: 2px; }
-:root[data-theme="dark"] mark { background: #5a4a20; color: #ffe082; }
+/* ====== Category browse ====== */
+.cat-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+.cat-block{background:var(--card);border:1px solid var(--cardBorder);border-radius:12px;padding:16px;cursor:pointer;transition:all .2s}
+.cat-block:hover{border-color:var(--accent2);box-shadow:0 4px 16px var(--shadow)}
+.cat-block .cat-name{font-size:16px;font-weight:bold;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.cat-block .cat-books{display:flex;gap:10px}
+.cat-block .cat-mini{flex:1;text-align:center}
+.cat-block .cat-mini .cat-cover-mini{width:60px;height:80px;border-radius:6px;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff}
+
+/* ====== My page ====== */
+#my-page{display:none;max-width:900px;margin:0 auto;padding:32px 24px}
+#my-page.show{display:block}
+#bookshelf.hidden,#category-tabs.hidden,#recommended-section.hidden,#banner.hidden,.section-wrap.hidden{display:none}
+.my-header{display:flex;align-items:center;gap:18px;margin-bottom:32px;padding:24px;background:var(--card);border:1px solid var(--cardBorder);border-radius:14px}
+.my-avatar{width:64px;height:64px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.my-info h2{font-size:22px;color:var(--text);margin-bottom:4px}
+.my-info .my-meta{font-size:12px;color:var(--text2)}
+.my-tabs{display:flex;gap:8px;margin-bottom:24px;border-bottom:1px solid var(--divider);padding-bottom:0}
+.my-tab{padding:10px 20px;border:none;background:none;color:var(--text2);cursor:pointer;font-size:14px;font-family:inherit;border-bottom:3px solid transparent;transition:all .15s}
+.my-tab:hover{color:var(--text)}
+.my-tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:bold}
+.my-tab-content{display:none}
+.my-tab-content.active{display:block}
+.my-book-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.my-empty{text-align:center;color:var(--text2);padding:60px 0;font-size:14px}
 
 /* ====== Reader ====== */
-#reader { display: none; height: calc(100vh - 52px); }
-#reader.active { display: flex; }
-#bookshelf.hidden { display: none; }
-#sidebar { width: 260px; min-width: 260px; background: var(--sidebar); border-right: 1px solid var(--divider); display: flex; flex-direction: column; transition: margin-left 0.3s; }
-#sidebar.collapsed { margin-left: -260px; }
-.sidebar-header { padding: 16px; border-bottom: 1px solid var(--divider); display: flex; align-items: center; justify-content: space-between; }
-.sidebar-header h3 { font-size: 14px; color: var(--text); }
-.sidebar-close { background: none; border: none; color: var(--text2); cursor: pointer; font-size: 18px; padding: 2px 6px; }
-.chapter-list { flex: 1; overflow-y: auto; padding: 8px 0; }
-.chapter-item { padding: 10px 16px; cursor: pointer; font-size: 13px; border-left: 3px solid transparent; color: var(--text2); transition: all 0.15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.chapter-item:hover { background: var(--hover); color: var(--text); }
-.chapter-item.current { color: var(--accent); font-weight: bold; border-left-color: var(--accent); background: var(--hover); }
-.bookmarks-mini { border-top: 1px solid var(--divider); padding: 12px 16px; }
-.bookmarks-mini h4 { font-size: 12px; color: var(--text2); margin-bottom: 8px; }
-.bm-mini-item { font-size: 11px; color: var(--accent); cursor: pointer; padding: 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-#content-area { flex: 1; overflow-y: auto; position: relative; }
-.content-header { padding: 16px 24px; border-bottom: 1px solid var(--divider); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.content-header .book-title { font-size: 16px; font-weight: bold; color: var(--text); }
-.content-header .chap-title { font-size: 13px; color: var(--text2); }
-.content-body { max-width: 700px; margin: 0 auto; padding: 40px 32px 30px; }
-.content-body .chapter-heading { text-align: center; font-size: 22px; font-weight: bold; margin-bottom: 32px; color: var(--text); }
-.content-body .chapter-text { font-size: var(--font-size, 17px); line-height: var(--line-height, 2); text-align: justify; letter-spacing: 0.5px; }
-.content-body .chapter-text p { text-indent: 2em; margin-bottom: 0.8em; }
-.nav-bottom { max-width: 700px; margin: 0 auto; padding: 0 32px 20px; display: flex; justify-content: space-between; gap: 12px; }
-.nav-btn { padding: 10px 24px; background: var(--card); border: 1px solid var(--cardBorder); border-radius: 8px; cursor: pointer; color: var(--text); font-family: inherit; font-size: 14px; transition: all 0.2s; }
-.nav-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
-.nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+#reader{display:none;height:calc(100vh - 52px)}
+#reader.active{display:flex}
+#sidebar{width:260px;min-width:260px;background:var(--sidebar);border-right:1px solid var(--divider);display:flex;flex-direction:column;transition:margin-left .3s}
+#sidebar.collapsed{margin-left:-260px}
+.sidebar-header{padding:16px;border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between}
+.sidebar-header h3{font-size:14px;color:var(--text)}
+.sidebar-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:18px;padding:2px 6px}
+.chapter-list{flex:1;overflow-y:auto;padding:8px 0}
+.chapter-item{padding:10px 16px;cursor:pointer;font-size:13px;border-left:3px solid transparent;color:var(--text2);transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chapter-item:hover{background:var(--hover);color:var(--text)}
+.chapter-item.current{color:var(--accent);font-weight:bold;border-left-color:var(--accent);background:var(--hover)}
+#content-area{flex:1;overflow-y:auto;position:relative}
+.content-header{padding:16px 24px;border-bottom:1px solid var(--divider);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.content-body{max-width:720px;margin:0 auto;padding:40px 32px 30px}
+.content-body .chapter-heading{text-align:center;font-size:22px;font-weight:bold;margin-bottom:32px;color:var(--text)}
+.content-body .chapter-text{font-size:var(--font-size,17px);line-height:var(--line-height,2);text-align:justify;letter-spacing:.5px}
+.content-body .chapter-text p{text-indent:2em;margin-bottom:.8em}
+.nav-bottom{max-width:720px;margin:0 auto;padding:0 32px 20px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.nav-btn{border-radius:8px;cursor:pointer;color:var(--text);font-family:inherit;font-size:14px;transition:all .2s;padding:10px 20px;background:var(--card);border:1px solid var(--cardBorder)}
+.nav-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.nav-btn:disabled{opacity:.4;cursor:not-allowed}
 
-/* ====== Rating section ====== */
-.rating-section { max-width: 700px; margin: 0 auto; padding: 0 32px 20px; border-top: 1px solid var(--divider); padding-top: 20px; }
-.rating-section .rating-header { font-size: 15px; font-weight: bold; color: var(--text); margin-bottom: 8px; }
-.rating-section .rating-current { font-size: 13px; color: var(--text2); margin-bottom: 10px; }
-.rating-stars { display: flex; gap: 4px; flex-wrap: wrap; }
-.rating-star { width: 32px; height: 32px; border-radius: 4px; border: 1px solid var(--divider); background: var(--bg); color: var(--text2); cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; font-family: inherit; }
-.rating-star:hover, .rating-star.active { background: var(--star); color: #fff; border-color: var(--star); font-weight: bold; }
-.rating-star.my-score { background: var(--accent); color: #fff; border-color: var(--accent); }
+.rating-section,.comments-section,.errata-section{max-width:720px;margin:0 auto;padding:0 32px 20px;border-top:1px solid var(--divider);padding-top:20px}
+.rating-header,.comments-header,.errata-header{font-size:15px;font-weight:bold;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:8px;justify-content:space-between}
+.rating-stars{display:flex;gap:4px;flex-wrap:wrap}
+.rating-star{width:32px;height:32px;border-radius:4px;border:1px solid var(--divider);background:var(--bg);color:var(--text2);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:inherit}
+.rating-star:hover,.rating-star.active{background:var(--star);color:#fff;border-color:var(--star)}
+.rating-star.my-score{background:var(--accent);color:#fff;border-color:var(--accent)}
+.comment-form{display:flex;gap:8px;margin-bottom:18px}
+.comment-form textarea{flex:1;padding:10px;border:1px solid var(--divider);border-radius:8px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;resize:vertical;min-height:60px;outline:none}
+.comment-form textarea:focus{border-color:var(--accent2)}
+.comment-form .comment-submit{padding:8px 18px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer;font-family:inherit;font-size:13px;white-space:nowrap;align-self:flex-end}
+.comment-item{padding:10px 0;border-bottom:1px solid var(--divider)}
+.comment-item .comment-user{font-size:13px;font-weight:bold;color:var(--accent)}
+.comment-item .comment-text{font-size:13px;color:var(--text);line-height:1.5}
+.comment-item .comment-time{font-size:10px;color:var(--text2);margin-top:4px}
+.errata-item{padding:10px 0;border-bottom:1px solid var(--divider)}
+.errata-meta{font-size:11px;color:var(--text2);margin-bottom:4px}
+.errata-desc{font-size:13px;color:var(--text);line-height:1.5}
+.errata-suggestion{font-size:12px;color:var(--accent);margin-top:4px}
+.errata-status{display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px}
+.errata-status.open{background:#e74c3c20;color:#e74c3c}
+.errata-status.fixed{background:#2ecc7120;color:#2ecc71}
 
-/* ====== Comments section ====== */
-.comments-section { max-width: 700px; margin: 0 auto; padding: 0 32px 40px; border-top: 1px solid var(--divider); padding-top: 20px; }
-.comments-section .comments-header { font-size: 15px; font-weight: bold; color: var(--text); margin-bottom: 12px; }
-.comment-form { display: flex; gap: 8px; margin-bottom: 18px; }
-.comment-form textarea { flex: 1; padding: 10px; border: 1px solid var(--divider); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 13px; font-family: inherit; resize: vertical; min-height: 60px; outline: none; }
-.comment-form textarea:focus { border-color: var(--accent2); }
-.comment-form .comment-submit { padding: 8px 18px; border-radius: 8px; border: none; background: var(--accent); color: #fff; cursor: pointer; font-family: inherit; font-size: 13px; white-space: nowrap; align-self: flex-end; }
-.comment-form .comment-submit:hover { opacity: 0.9; }
-.comment-list { max-height: 400px; overflow-y: auto; }
-.comment-item { padding: 12px 0; border-bottom: 1px solid var(--divider); }
-.comment-item .comment-user { font-size: 13px; font-weight: bold; color: var(--accent); margin-bottom: 2px; }
-.comment-item .comment-text { font-size: 13px; color: var(--text); line-height: 1.5; }
-.comment-item .comment-time { font-size: 10px; color: var(--text2); margin-top: 4px; }
+/* ====== Float & Modals ====== */
+#float-toolbar{position:fixed;bottom:32px;right:32px;z-index:50;display:flex;flex-direction:column;gap:8px}
+.float-btn{width:42px;height:42px;border-radius:50%;border:1px solid var(--cardBorder);background:var(--card);color:var(--text2);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 2px 8px var(--shadow)}
+.float-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+#back-top{position:fixed;bottom:100px;right:32px;z-index:50;width:42px;height:42px;border-radius:50%;border:1px solid var(--cardBorder);background:var(--card);color:var(--text2);cursor:pointer;font-size:16px;display:none;align-items:center;justify-content:center;box-shadow:0 2px 8px var(--shadow)}
+#back-top:hover{background:var(--accent);color:#fff}
+.modal-overlay{display:none;position:fixed;inset:0;z-index:199;background:rgba(0,0,0,.4)}
+.modal-overlay.show{display:block}
+.modal-panel{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--card);border:1px solid var(--cardBorder);border-radius:16px;padding:28px;z-index:200;box-shadow:0 12px 40px var(--shadow);width:400px;max-height:85vh;overflow-y:auto}
+.modal-panel.wide{width:560px}
+.modal-panel.show{display:block}
+.modal-title{font-size:20px;font-weight:bold;margin-bottom:18px;color:var(--text);text-align:center}
+.modal-close{position:absolute;top:12px;right:16px;background:none;border:none;color:var(--text2);cursor:pointer;font-size:20px}
+.form-group{margin-bottom:12px}
+.form-group label{display:block;font-size:13px;color:var(--text2);margin-bottom:4px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;border:1px solid var(--divider);border-radius:8px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;outline:none;resize:vertical}
+.form-group textarea{min-height:80px}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent2)}
+.form-error{color:#e74c3c;font-size:12px;margin-top:4px;min-height:16px}
+.submit-btn{width:100%;padding:10px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-size:15px;cursor:pointer;font-family:inherit;margin-top:6px;transition:opacity .2s}
+.submit-btn:hover{opacity:.9}
+.switch-text{text-align:center;margin-top:14px;font-size:13px;color:var(--text2)}
+.switch-text a{color:var(--accent);cursor:pointer;text-decoration:underline}
+.chapter-editor{border:1px solid var(--divider);border-radius:8px;padding:12px;margin-bottom:10px;background:var(--bg)}
+.add-chapter-btn{padding:6px 16px;border:1px dashed var(--divider);border-radius:8px;background:none;color:var(--accent);cursor:pointer;font-size:12px;font-family:inherit;width:100%}
+.setting-opt{padding:4px 12px;border-radius:6px;border:1px solid var(--divider);background:var(--bg);color:var(--text2);cursor:pointer;font-size:12px;font-family:inherit;transition:all .15s}
+.setting-opt:hover{border-color:var(--accent2)}
+.setting-opt.selected{background:var(--accent);color:#fff;border-color:var(--accent)}
+mark{background:#ffe082;color:#333;padding:0 1px;border-radius:2px}
+:root[data-theme="dark"] mark{background:#5a4a20;color:#ffe082}
 
-/* ====== Float toolbar ====== */
-#float-toolbar { position: fixed; bottom: 32px; right: 32px; z-index: 50; display: flex; flex-direction: column; gap: 8px; }
-.float-btn { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--cardBorder); background: var(--card); color: var(--text2); cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 2px 8px var(--shadow); }
-.float-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
-#back-top { position: fixed; bottom: 100px; right: 32px; z-index: 50; width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--cardBorder); background: var(--card); color: var(--text2); cursor: pointer; font-size: 16px; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 8px var(--shadow); transition: all 0.2s; }
-#back-top:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
-
-/* ====== Modals ====== */
-.modal-overlay { display: none; position: fixed; inset: 0; z-index: 199; background: rgba(0,0,0,0.4); }
-.modal-overlay.show { display: block; }
-.modal-panel { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card); border: 1px solid var(--cardBorder); border-radius: 16px; padding: 28px; z-index: 200; box-shadow: 0 12px 40px var(--shadow); width: 400px; max-height: 85vh; overflow-y: auto; }
-.modal-panel.wide { width: 560px; }
-.modal-panel.show { display: block; }
-.modal-title { font-size: 20px; font-weight: bold; margin-bottom: 18px; color: var(--text); text-align: center; }
-.modal-close { position: absolute; top: 12px; right: 16px; background: none; border: none; color: var(--text2); cursor: pointer; font-size: 20px; }
-.form-group { margin-bottom: 12px; }
-.form-group label { display: block; font-size: 13px; color: var(--text2); margin-bottom: 4px; }
-.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 9px 12px; border: 1px solid var(--divider); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 13px; font-family: inherit; outline: none; resize: vertical; }
-.form-group textarea { min-height: 80px; }
-.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent2); }
-.form-error { color: #e74c3c; font-size: 12px; margin-top: 4px; min-height: 16px; }
-.submit-btn { width: 100%; padding: 10px; border-radius: 8px; border: none; background: var(--accent); color: #fff; font-size: 15px; cursor: pointer; font-family: inherit; margin-top: 6px; transition: opacity 0.2s; }
-.submit-btn:hover { opacity: 0.9; }
-.switch-text { text-align: center; margin-top: 14px; font-size: 13px; color: var(--text2); }
-.switch-text a { color: var(--accent); cursor: pointer; text-decoration: underline; }
-
-/* Chapter editor in upload */
-.chapter-editor { border: 1px solid var(--divider); border-radius: 8px; padding: 12px; margin-bottom: 10px; background: var(--bg); }
-.chapter-editor .ch-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-.chapter-editor .ch-header span { font-size: 12px; color: var(--text2); }
-.chapter-editor .ch-header button { background: none; border: none; color: #c0392b; cursor: pointer; font-size: 14px; }
-.add-chapter-btn { padding: 6px 16px; border: 1px dashed var(--divider); border-radius: 8px; background: none; color: var(--accent); cursor: pointer; font-size: 12px; font-family: inherit; width: 100%; }
-
-/* Responsive */
-@media (max-width: 768px) {
-  #sidebar { width: 100%; min-width: 100%; position: fixed; top: 52px; left: 0; height: calc(100vh - 52px); z-index: 90; }
-  #sidebar.collapsed { margin-left: -100%; }
-  .content-body { padding: 24px 16px 20px; }
-  #float-toolbar { bottom: 16px; right: 16px; }
-  .modal-panel { width: 90vw; }
-  .book-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
-  #topbar { gap: 6px; }
-  .search-wrap { max-width: 140px; }
-  .rating-stars { gap: 2px; }
-  .rating-star { width: 28px; height: 28px; font-size: 11px; }
+@media(max-width:768px){
+  #sidebar{width:100%;min-width:100%;position:fixed;top:52px;left:0;height:calc(100vh - 52px);z-index:90}
+  #sidebar.collapsed{margin-left:-100%}
+  .banner-slide{height:200px}
+  .banner-slide .banner-content{padding:16px;gap:16px}
+  .banner-slide .banner-cover{width:90px;height:130px;font-size:32px}
+  .banner-slide .banner-info h2{font-size:20px}
+  .content-body{padding:24px 16px 20px}
+  .book-card{min-width:130px;max-width:130px}
+  .book-card .card-cover{height:170px}
 }
-
-.setting-opt { padding: 4px 12px; border-radius: 6px; border: 1px solid var(--divider); background: var(--bg); color: var(--text2); cursor: pointer; font-size: 12px; font-family: inherit; transition: all 0.15s; }
-.setting-opt:hover { border-color: var(--accent2); }
-.setting-opt.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
-
-/* Author actions on book card */
-.author-actions { position: absolute; bottom: 8px; right: 8px; display: flex; gap: 4px; z-index: 2; }
-.author-actions .aa-btn { padding: 3px 8px; border-radius: 6px; border: none; cursor: pointer; font-size: 10px; font-family: inherit; color: #fff; transition: opacity 0.2s; }
-.author-actions .aa-btn:hover { opacity: 0.85; }
-.author-actions .aa-edit { background: #3498db; }
-.author-actions .aa-del { background: #c0392b; }
-.book-card { position: relative; }
-
-/* Errata section */
-.errata-section { max-width: 700px; margin: 0 auto; padding: 0 32px 20px; border-top: 1px solid var(--divider); padding-top: 20px; }
-.errata-section .errata-header { font-size: 15px; font-weight: bold; color: var(--text); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; justify-content: space-between; }
-.errata-item { padding: 10px 0; border-bottom: 1px solid var(--divider); }
-.errata-item .errata-meta { font-size: 11px; color: var(--text2); margin-bottom: 4px; }
-.errata-item .errata-desc { font-size: 13px; color: var(--text); line-height: 1.5; }
-.errata-item .errata-suggestion { font-size: 12px; color: var(--accent); margin-top: 4px; }
-.errata-item .errata-actions { margin-top: 6px; display: flex; gap: 6px; }
-.errata-status { display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 10px; }
-.errata-status.open { background: #e74c3c20; color: #e74c3c; }
-.errata-status.fixed { background: #2ecc7120; color: #2ecc71; }
 </style>
 </head>
 <body>
 
 <!-- ====== Topbar ====== -->
 <nav id="topbar">
-  <span class="logo" onclick="goBookshelf()">云中书阁</span>
+  <span class="logo" onclick="goHome()">云中书阁</span>
   <div class="search-wrap"><span class="search-icon">🔍</span><input type="text" id="search-input" placeholder="搜书名、作者..." oninput="onSearch()"></div>
-  <div class="right-btns" id="topbar-right">
-    <button class="top-btn upload-btn" onclick="showUploadModal()">📝 投稿</button>
-    <button class="top-btn" onclick="showAuthModal('login')" id="btn-login">登录</button>
-    <button class="top-btn" onclick="showAuthModal('register')" id="btn-register">注册</button>
-    <div class="user-dropdown" id="user-dropdown" style="display:none">
-      <button class="top-btn primary" onclick="toggleUserMenu()" id="btn-user">👤 <span id="username-display"></span></button>
-      <div class="dropdown-menu" id="user-menu">
-        <div class="dm-item" onclick="showUploadModal()">📝 我要投稿</div>
-        <div class="dm-item" onclick="showBookshelf()">📚 我的书架</div>
-        <div class="dm-item" onclick="showBookmarks()">📑 我的书签</div>
-        <div class="dm-item" onclick="logout()">🚪 退出登录</div>
-      </div>
-    </div>
-    <button class="top-btn" onclick="toggleSidebar()" id="btn-toc" style="display:none">📖 目录</button>
-    <button class="top-btn" onclick="showBookmarks()" id="btn-bm" style="display:none">🔖 书签</button>
-    <button class="top-btn" onclick="showSettings()">⚙ 设置</button>
-  </div>
+  <button class="nav-btn" id="nav-home" onclick="goHome()">🏠 首页</button>
+  <button class="nav-btn" id="nav-my" onclick="showMyPage()" style="display:none">👤 我的</button>
+  <button class="nav-btn upload-btn" onclick="showUploadModal()">📝 投稿</button>
+  <button class="nav-btn" onclick="showAuthModal('login')" id="btn-login">登录</button>
+  <button class="nav-btn" onclick="showAuthModal('register')" id="btn-register">注册</button>
+  <button class="nav-btn" id="btn-logout" onclick="logout()" style="display:none">🚪</button>
+  <button class="nav-btn" onclick="showSettings()">⚙</button>
 </nav>
 
-<!-- ====== Bookshelf ====== -->
-<div id="bookshelf">
-  <h1>📚 云中书阁</h1>
-  <p class="subtitle">一卷在手，天下我有</p>
-  <div id="category-tabs"></div>
-  <div style="text-align:center;margin-bottom:20px">
-    <button class="top-btn" onclick="showBookshelf()" style="font-size:14px;padding:8px 20px">📚 我的书架</button>
+<!-- ====== Homepage ====== -->
+<div id="homepage">
+  <div id="banner"></div>
+  <div class="section-wrap" id="rec-section">
+    <div class="section-title"><span class="sec-icon">⭐</span> 热门推荐</div>
+    <div class="book-scroll" id="rec-scroll"></div>
   </div>
-  <div class="recommended-section" id="recommended-section" style="display:none"></div>
-  <div class="book-grid" id="book-grid"></div>
-  <div class="no-results" id="no-results" style="display:none">没有找到匹配的小说</div>
-  <!-- Bookshelf view -->
-  <div id="bookshelf-view" style="display:none">
-    <h2 style="text-align:center;color:var(--text);margin-bottom:4px">📚 我的书架</h2>
-    <p style="text-align:center;color:var(--text2);font-size:13px;margin-bottom:20px" id="bookshelf-count"></p>
-    <div class="book-grid" id="bookshelf-grid"></div>
-    <div style="text-align:center;padding:40px"><button class="top-btn" onclick="renderBookshelf()" style="font-size:14px;padding:8px 20px">← 返回全部小说</button></div>
+  <div class="section-wrap" id="new-section">
+    <div class="section-title"><span class="sec-icon">🆕</span> 新书上架</div>
+    <div class="book-scroll" id="new-scroll"></div>
+  </div>
+  <div class="section-wrap" id="cat-section">
+    <div class="section-title"><span class="sec-icon">📂</span> 分类浏览</div>
+    <div class="cat-row" id="cat-row"></div>
+  </div>
+  <div class="section-wrap">
+    <div class="section-title"><span class="sec-icon">📚</span> 全部书籍 <span class="sec-more" id="book-count"></span></div>
+    <div id="category-tabs" style="display:flex;gap:6px;justify-content:center;margin-bottom:20px;flex-wrap:wrap"></div>
+    <div class="book-scroll" id="book-grid-scroll" style="flex-wrap:wrap;gap:14px"></div>
+    <div class="no-results" id="no-results" style="display:none;text-align:center;color:var(--text2);padding:40px">没有找到匹配的小说</div>
+  </div>
+</div>
+
+<!-- ====== My Page ====== -->
+<div id="my-page">
+  <div class="my-header">
+    <div class="my-avatar">👤</div>
+    <div class="my-info"><h2 id="my-username"></h2><div class="my-meta" id="my-meta"></div></div>
+  </div>
+  <div class="my-tabs">
+    <button class="my-tab active" onclick="switchMyTab('bookshelf')">📚 我的书架</button>
+    <button class="my-tab" onclick="switchMyTab('bookmarks')">🔖 我的书签</button>
+    <button class="my-tab" onclick="switchMyTab('uploads')">📝 我的投稿</button>
+    <button class="my-tab" onclick="switchMyTab('settings')">⚙ 阅读设置</button>
+  </div>
+  <div class="my-tab-content active" id="my-tab-bookshelf">
+    <div class="my-book-grid" id="my-bookshelf-grid"></div>
+    <div class="my-empty" id="my-bookshelf-empty">还没有收藏任何小说</div>
+  </div>
+  <div class="my-tab-content" id="my-tab-bookmarks">
+    <div id="my-bookmark-list"></div>
+    <div class="my-empty" id="my-bookmarks-empty">暂无书签</div>
+  </div>
+  <div class="my-tab-content" id="my-tab-uploads">
+    <div class="my-book-grid" id="my-uploads-grid"></div>
+    <div class="my-empty" id="my-uploads-empty">还没有投稿作品</div>
+  </div>
+  <div class="my-tab-content" id="my-tab-settings">
+    <div id="my-settings-ui"></div>
   </div>
 </div>
 
@@ -270,15 +275,15 @@ mark { background: #ffe082; color: #333; padding: 0 1px; border-radius: 2px; }
   <aside id="sidebar">
     <div class="sidebar-header"><h3>章节目录</h3><button class="sidebar-close" onclick="toggleSidebar()">✕</button></div>
     <div class="chapter-list" id="chapter-list"></div>
-    <div class="bookmarks-mini" id="bookmarks-mini"></div>
+    <div id="bookmarks-mini" style="border-top:1px solid var(--divider);padding:12px 16px;font-size:12px"></div>
   </aside>
   <div id="content-area">
-    <div class="content-header"><span class="book-title" id="curr-book-title"></span><span class="chap-title" id="curr-chap-title"></span></div>
+    <div class="content-header"><span id="curr-book-title" style="font-weight:bold;color:var(--text)"></span><span id="curr-chap-title" style="font-size:13px;color:var(--text2)"></span></div>
     <div class="content-body" id="content-body"></div>
     <div class="nav-bottom">
       <button class="nav-btn" id="btn-prev" onclick="prevChapter()">← 上一章</button>
-      <button class="nav-btn" id="btn-bookmark" onclick="toggleBookmark()">🔖 添加书签</button>
       <button class="nav-btn" id="btn-fav" onclick="toggleBookshelfItem(App.currentBookId,event)">🤍 收藏</button>
+      <button class="nav-btn" id="btn-bookmark" onclick="toggleBookmark()">🔖 书签</button>
       <button class="nav-btn" id="btn-next" onclick="nextChapter()">下一章 →</button>
     </div>
     <div class="rating-section" id="rating-section"></div>
@@ -288,16 +293,15 @@ mark { background: #ffe082; color: #333; padding: 0 1px; border-radius: 2px; }
 </div>
 
 <div id="float-toolbar" style="display:none">
-  <button class="float-btn" title="目录" onclick="toggleSidebar()">📖</button>
-  <button class="float-btn" title="书签" onclick="showBookmarks()">🔖</button>
-  <button class="float-btn" title="设置" onclick="showSettings()">⚙</button>
+  <button class="float-btn" onclick="toggleSidebar()">📖</button>
+  <button class="float-btn" onclick="showMyPage()">👤</button>
+  <button class="float-btn" onclick="showSettings()">⚙</button>
 </div>
 <button id="back-top" onclick="document.getElementById('content-area').scrollTo({top:0,behavior:'smooth'})">⬆</button>
 
 <!-- ====== Modals ====== -->
 <div class="modal-overlay" id="modal-overlay" onclick="closeAllModals()"></div>
 
-<!-- Login -->
 <div class="modal-panel" id="modal-login"><button class="modal-close" onclick="closeAllModals()">✕</button>
   <div class="modal-title">登录</div>
   <div class="form-group"><label>用户名</label><input type="text" id="login-username" placeholder="请输入用户名"></div>
@@ -307,28 +311,27 @@ mark { background: #ffe082; color: #333; padding: 0 1px; border-radius: 2px; }
   <div class="switch-text">还没有账号？<a onclick="showAuthModal('register')">立即注册</a></div>
 </div>
 
-<!-- Register -->
 <div class="modal-panel" id="modal-register"><button class="modal-close" onclick="closeAllModals()">✕</button>
   <div class="modal-title">注册</div>
-  <div class="form-group"><label>用户名</label><input type="text" id="reg-username" placeholder="3-16位字母数字下划线中文"></div>
-  <div class="form-group"><label>密码</label><input type="password" id="reg-password" placeholder="至少6位密码"></div>
+  <div class="form-group"><label>用户名</label><input type="text" id="reg-username" placeholder="3-16位，字母数字下划线中文"></div>
+  <div class="form-group"><label>密码</label><input type="password" id="reg-password" placeholder="至少6位，不含中文"></div>
   <div class="form-group"><label>确认密码</label><input type="password" id="reg-password2" placeholder="再次输入密码"></div>
   <div class="form-error" id="reg-error"></div>
   <button class="submit-btn" onclick="doRegister()">注 册</button>
   <div class="switch-text">已有账号？<a onclick="showAuthModal('login')">立即登录</a></div>
 </div>
 
-<!-- Errata form -->
 <div class="modal-panel" id="modal-errata"><button class="modal-close" onclick="closeAllModals()">✕</button>
-  <div class="modal-title">📝 纠错反馈</div>
+  <div class="modal-title">纠错反馈</div>
   <div class="form-group"><label>章节</label><input type="text" id="errata-chapter" readonly style="background:var(--bg2)"></div>
-  <div class="form-group"><label>错误描述 *</label><textarea id="errata-desc" placeholder="请描述发现的错误（错别字、逻辑矛盾等）..." rows="3"></textarea></div>
+  <div class="form-group"><label>错误描述 *</label><textarea id="errata-desc" placeholder="请描述发现的错误..." rows="3"></textarea></div>
   <div class="form-group"><label>修改建议</label><textarea id="errata-suggestion" placeholder="建议如何修改（可选）..." rows="2"></textarea></div>
   <div class="form-error" id="errata-error"></div>
   <button class="submit-btn" onclick="submitErrata()">提交纠错</button>
 </div>
+
 <div class="modal-panel wide" id="modal-upload"><button class="modal-close" onclick="closeAllModals()">✕</button>
-  <div class="modal-title">📝 投稿小说</div>
+  <div class="modal-title" id="upload-modal-title">📝 投稿小说</div>
   <div class="form-group"><label>书名 *</label><input type="text" id="up-title" placeholder="请输入小说书名"></div>
   <div class="form-group"><label>作者笔名 *</label><input type="text" id="up-author" placeholder="请输入作者笔名"></div>
   <div class="form-group"><label>分类 *</label>
@@ -344,10 +347,9 @@ mark { background: #ffe082; color: #333; padding: 0 1px; border-radius: 2px; }
     <button class="add-chapter-btn" onclick="addChapterField()" style="margin-top:6px">+ 添加章节</button>
   </div>
   <div class="form-error" id="up-error"></div>
-  <button class="submit-btn" onclick="submitNovel()">提交投稿</button>
+  <button class="submit-btn" id="upload-submit-btn" onclick="submitNovel()">提交投稿</button>
 </div>
 
-<!-- Settings -->
 <div class="modal-panel" id="settings-panel"><button class="modal-close" onclick="closeAllModals()">✕</button>
   <div class="modal-title">阅读设置</div>
   <div class="form-group" style="display:flex;justify-content:space-between;align-items:center"><label>字体大小</label><div id="font-size-opts" style="display:flex;gap:4px"></div></div>
@@ -356,38 +358,17 @@ mark { background: #ffe082; color: #333; padding: 0 1px; border-radius: 2px; }
   <div class="form-group" style="display:flex;justify-content:space-between;align-items:center"><label>字体</label><div id="font-family-opts" style="display:flex;gap:4px"></div></div>
 </div>
 
-<!-- Bookmarks -->
-<div class="modal-panel" id="bookmark-panel" style="max-height:500px;overflow-y:auto"><button class="modal-close" onclick="closeAllModals()">✕</button>
-  <div class="modal-title">我的书签</div>
-  <div id="bookmark-list"><p style="color:var(--text2);font-size:13px;text-align:center">暂无书签</p></div>
-</div>
-
 <script>
-// ==================== SHA-256 (native crypto API) ====================
-async function sha256(str) {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(str);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
+// ==================== SHA-256 ====================
+async function sha256(str){const e=new TextEncoder();const d=e.encode(str);const h=await crypto.subtle.digest('SHA-256',d);return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join('');}
 
 // ==================== Data ====================
-const CATEGORIES = ['全部','推荐','科幻','言情','武侠','悬疑','历史','奇幻','都市','灵异','游戏','军事'];
-const CAT_MAP = {'科幻':'scifi','言情':'romance','武侠':'wuxia','悬疑':'mystery','历史':'history','奇幻':'fantasy','都市':'urban','灵异':'horror','游戏':'gaming','军事':'military'};
-const COVER_GRADIENTS = {
-  scifi: 'linear-gradient(135deg,#0c1445,#1a3a6c,#2d5aa0)',
-  romance: 'linear-gradient(135deg,#4a6fa5,#6b8fc0,#9bb5d6)',
-  wuxia: 'linear-gradient(135deg,#2c1810,#4a2c17,#6b3a20)',
-  mystery: 'linear-gradient(135deg,#1a1a1a,#2d2d2d,#444)',
-  history: 'linear-gradient(135deg,#5c1a1a,#8b2e2e,#a94442)',
-  fantasy: 'linear-gradient(135deg,#1a0a3e,#3d1a6e,#6b3fa0)',
-  urban: 'linear-gradient(135deg,#1a3a4a,#2d6078,#4a90a4)',
-  horror: 'linear-gradient(135deg,#0d0d0d,#1a0a0a,#330d0d)',
-  gaming: 'linear-gradient(135deg,#0a1a2e,#1a3d5c,#2d6b99)',
-  military: 'linear-gradient(135deg,#1a2a0a,#3d4a1a,#5a6b2a)',
-};
-const COVER_EMOJI = {scifi:'🌌',romance:'🌧',wuxia:'⚔',mystery:'🔍',history:'🏯',fantasy:'🔮',urban:'🏙',horror:'👻',gaming:'🎮',military:'🎖'};
+const CATEGORIES=['科幻','言情','武侠','悬疑','历史','奇幻','都市','灵异','游戏','军事'];
+const CAT_MAP={'科幻':'scifi','言情':'romance','武侠':'wuxia','悬疑':'mystery','历史':'history','奇幻':'fantasy','都市':'urban','灵异':'horror','游戏':'gaming','军事':'military'};
+const COVER_GRADIENTS={scifi:'linear-gradient(135deg,#0c1445,#1a3a6c,#2d5aa0)',romance:'linear-gradient(135deg,#4a6fa5,#6b8fc0,#9bb5d6)',wuxia:'linear-gradient(135deg,#2c1810,#4a2c17,#6b3a20)',mystery:'linear-gradient(135deg,#1a1a1a,#2d2d2d,#444)',history:'linear-gradient(135deg,#5c1a1a,#8b2e2e,#a94442)',fantasy:'linear-gradient(135deg,#1a0a3e,#3d1a6e,#6b3fa0)',urban:'linear-gradient(135deg,#1a3a4a,#2d6078,#4a90a4)',horror:'linear-gradient(135deg,#0d0d0d,#1a0a0a,#330d0d)',gaming:'linear-gradient(135deg,#0a1a2e,#1a3d5c,#2d6b99)',military:'linear-gradient(135deg,#1a2a0a,#3d4a1a,#5a6b2a)'};
+const COVER_EMOJI={scifi:'🌌',romance:'🌧',wuxia:'⚔',mystery:'🔍',history:'🏯',fantasy:'🔮',urban:'🏙',horror:'👻',gaming:'🎮',military:'🎖'};
+
+ERROR_NOVELS_NOT_FOUND
 
 const BUILTIN_NOVELS = [
   {id:'xingchen',title:'星辰之下',author:'凌云',category:'scifi',desc:'在遥远的未来，人类文明已经遍布银河系。一个普通的星际快递员，偶然发现了一个惊天秘密，从此踏上拯救文明的旅程。',chapters:[
@@ -573,811 +554,195 @@ const BUILTIN_NOVELS = [
   ]}
 ;
 
-function getAllNovels() {
-  const uploaded = getUploadedNovels();
-  return [...BUILTIN_NOVELS, ...uploaded];
-}
 
-// ==================== Uploaded novels ====================
-function getUploadedNovels() {
-  try { return JSON.parse(localStorage.getItem('novel_uploads')) || []; } catch(e) { return []; }
-}
-function saveUploadedNovels(novels) { localStorage.setItem('novel_uploads', JSON.stringify(novels)); }
 
-function addChapterField() {
-  const container = document.getElementById('chapter-editors');
-  const count = container.querySelectorAll('.chapter-editor').length + 1;
-  const div = document.createElement('div');
-  div.className = 'chapter-editor';
-  div.innerHTML = `<div class="ch-header"><span>第${count}章</span><button onclick="this.closest('.chapter-editor').remove()">✕</button></div>
-    <input type="text" class="ch-title" placeholder="章节标题（可选）" style="width:100%;margin-bottom:6px;padding:7px 10px;border:1px solid var(--divider);border-radius:6px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit">
-    <textarea class="ch-content" placeholder="请输入章节内容..." style="width:100%;min-height:100px;padding:8px;border:1px solid var(--divider);border-radius:6px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;resize:vertical"></textarea>`;
-  container.appendChild(div);
-}
+function getAllNovels(){const u=getUploadedNovels();return[...BUILTIN_NOVELS,...u];}
 
-function showUploadModal() {
-  if (!App.user) { showAuthModal('login'); return; }
-  closeAllModals();
-  document.getElementById('modal-upload').dataset.editId = '';
-  document.getElementById('modal-upload').querySelector('.modal-title').textContent = '📝 投稿小说';
-  document.querySelector('#modal-upload .submit-btn').textContent = '提交投稿';
-  document.querySelector('#modal-upload .submit-btn').onclick = submitNovel;
-  document.getElementById('modal-overlay').classList.add('show');
-  document.getElementById('modal-upload').classList.add('show');
-  document.getElementById('up-title').value = '';
-  document.getElementById('up-author').value = '';
-  document.getElementById('up-desc').value = '';
-  document.getElementById('up-error').textContent = '';
-  document.getElementById('chapter-editors').innerHTML = `<div class="chapter-editor"><div class="ch-header"><span>第1章</span></div>
-    <input type="text" class="ch-title" placeholder="章节标题（可选）" style="width:100%;margin-bottom:6px;padding:7px 10px;border:1px solid var(--divider);border-radius:6px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit">
-    <textarea class="ch-content" placeholder="请输入章节内容..." style="width:100%;min-height:100px;padding:8px;border:1px solid var(--divider);border-radius:6px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;resize:vertical"></textarea></div>`;
-}
-
-function submitNovel() {
-  const title = document.getElementById('up-title').value.trim();
-  const author = document.getElementById('up-author').value.trim();
-  const category = document.getElementById('up-category').value;
-  const desc = document.getElementById('up-desc').value.trim();
-  const errEl = document.getElementById('up-error');
-
-  if (!title) { errEl.textContent = '请输入书名'; return; }
-  if (!author) { errEl.textContent = '请输入作者笔名'; return; }
-
-  const editors = document.querySelectorAll('#chapter-editors .chapter-editor');
-  const chapters = [];
-  editors.forEach((ed, i) => {
-    const chTitle = ed.querySelector('.ch-title').value.trim() || `第${i+1}章`;
-    const chContent = ed.querySelector('.ch-content').value.trim();
-    if (chContent) {
-      chapters.push({
-        id: 'ch' + (i+1),
-        title: `第${i+1}章  ${chTitle}`,
-        content: chContent.split('\n').filter(l => l.trim())
-      });
-    }
-  });
-
-  if (chapters.length === 0) { errEl.textContent = '请至少填写一章内容'; return; }
-
-  const novel = {
-    id: 'upload_' + Date.now(),
-    title, author, category, desc,
-    cover: COVER_GRADIENTS[category],
-    emoji: COVER_EMOJI[category],
-    chapters,
-    uploadedBy: App.user.username,
-    uploadedAt: Date.now(),
-    isUploaded: true,
-  };
-
-  const uploaded = getUploadedNovels();
-  uploaded.unshift(novel);
-  saveUploadedNovels(uploaded);
-
-  closeAllModals();
-  App.currentCategory = '全部';
-  renderBookshelf();
-}
-
-// ==================== Delete & Edit novels ====================
-function deleteNovel(bookId) {
-  if (!App.user) return;
-  const uploaded = getUploadedNovels();
-  const novel = uploaded.find(n => n.id === bookId);
-  if (!novel || novel.uploadedBy !== App.user.username) return;
-  if (!confirm('确定要删除《' + novel.title + '》吗？此操作不可撤销！')) return;
-  const idx = uploaded.indexOf(novel);
-  uploaded.splice(idx, 1);
-  saveUploadedNovels(uploaded);
-  // Clean associated data
-  localStorage.removeItem('novel_comments_' + bookId);
-  localStorage.removeItem('novel_ratings_' + bookId);
-  localStorage.removeItem('novel_errata_' + bookId);
-  // Clear bookmarks for this book
-  Object.keys(App.bookmarks).forEach(k => { if (App.bookmarks[k].bookId === bookId) delete App.bookmarks[k]; });
-  saveBookmarks();
-  if (App.currentBookId === bookId) goBookshelf();
-  renderBookshelf();
-}
-
-function editNovel(bookId) {
-  if (!App.user) return;
-  const uploaded = getUploadedNovels();
-  const novel = uploaded.find(n => n.id === bookId);
-  if (!novel || novel.uploadedBy !== App.user.username) return;
-  closeAllModals();
-  document.getElementById('modal-overlay').classList.add('show');
-  document.getElementById('modal-upload').classList.add('show');
-  document.getElementById('modal-upload').dataset.editId = bookId;
-  document.getElementById('modal-upload').querySelector('.modal-title').textContent = '✎ 编辑作品';
-  document.getElementById('up-title').value = novel.title;
-  document.getElementById('up-author').value = novel.author;
-  document.getElementById('up-category').value = novel.category;
-  document.getElementById('up-desc').value = novel.desc || '';
-  document.getElementById('up-error').textContent = '';
-  // Populate chapters
-  const container = document.getElementById('chapter-editors');
-  container.innerHTML = novel.chapters.map((ch, i) =>
-    '<div class="chapter-editor"><div class="ch-header"><span>第' + (i+1) + '章</span>' + (i>0?'<button onclick="this.closest(\'.chapter-editor\').remove()">✕</button>':'') + '</div>' +
-    '<input type="text" class="ch-title" value="' + ch.title.replace(/"/g,'&quot;') + '" style="width:100%;margin-bottom:6px;padding:7px 10px;border:1px solid var(--divider);border-radius:6px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit">' +
-    '<textarea class="ch-content" style="width:100%;min-height:100px;padding:8px;border:1px solid var(--divider);border-radius:6px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;resize:vertical">' + ch.content.join('\n') + '</textarea></div>'
-  ).join('');
-  document.querySelector('#modal-upload .submit-btn').textContent = '保存修改';
-  document.querySelector('#modal-upload .submit-btn').onclick = submitEdit;
-}
-
-function submitEdit() {
-  const bookId = document.getElementById('modal-upload').dataset.editId;
-  const title = document.getElementById('up-title').value.trim();
-  const author = document.getElementById('up-author').value.trim();
-  const category = document.getElementById('up-category').value;
-  const desc = document.getElementById('up-desc').value.trim();
-  const errEl = document.getElementById('up-error');
-  if (!title) { errEl.textContent = '请输入书名'; return; }
-  if (!author) { errEl.textContent = '请输入作者笔名'; return; }
-
-  const editors = document.querySelectorAll('#chapter-editors .chapter-editor');
-  const chapters = [];
-  editors.forEach((ed, i) => {
-    const chTitle = ed.querySelector('.ch-title').value.trim() || ('第'+(i+1)+'章');
-    const chContent = ed.querySelector('.ch-content').value.trim();
-    if (chContent) {
-      chapters.push({ id: 'ch'+(i+1), title: '第'+(i+1)+'章  '+chTitle, content: chContent.split('\n').filter(l=>l.trim()) });
-    }
-  });
-  if (chapters.length === 0) { errEl.textContent = '请至少保留一章内容'; return; }
-
-  const uploaded = getUploadedNovels();
-  const novel = uploaded.find(n => n.id === bookId);
-  if (!novel) return;
-  novel.title = title; novel.author = author; novel.category = category; novel.desc = desc;
-  novel.chapters = chapters;
-  novel.cover = COVER_GRADIENTS[category];
-  novel.emoji = COVER_EMOJI[category];
-  saveUploadedNovels(uploaded);
-
-  closeAllModals();
-  App.currentCategory = '全部';
-  renderBookshelf();
-  if (App.currentBookId === bookId) openReader(bookId, App.currentChapterIdx);
-}
-
-// ==================== Errata system ====================
-function getErrata(bookId) {
-  try { return JSON.parse(localStorage.getItem('novel_errata_' + bookId)) || []; } catch(e) { return []; }
-}
-function saveErrata(bookId, errata) { localStorage.setItem('novel_errata_' + bookId, JSON.stringify(errata)); }
-
-function showErrataForm() {
-  if (!App.user) { showAuthModal('login'); return; }
-  const allNovels = getAllNovels(); const book = allNovels.find(n => n.id === App.currentBookId);
-  if (!book) return;
-  const ch = book.chapters[App.currentChapterIdx];
-  closeAllModals();
-  document.getElementById('modal-overlay').classList.add('show');
-  document.getElementById('modal-errata').classList.add('show');
-  document.getElementById('errata-chapter').value = ch.title;
-  document.getElementById('errata-desc').value = '';
-  document.getElementById('errata-suggestion').value = '';
-  document.getElementById('errata-error').textContent = '';
-}
-
-function submitErrata() {
-  const desc = document.getElementById('errata-desc').value.trim();
-  const suggestion = document.getElementById('errata-suggestion').value.trim();
-  const errEl = document.getElementById('errata-error');
-  if (!desc) { errEl.textContent = '请描述发现的错误'; return; }
-
-  const bookId = App.currentBookId;
-  const ch = getAllNovels().find(n=>n.id===bookId).chapters[App.currentChapterIdx];
-  const errata = getErrata(bookId);
-  errata.unshift({
-    id: 'e' + Date.now(),
-    chapterIdx: App.currentChapterIdx,
-    chapterTitle: ch.title,
-    description: desc,
-    suggestion: suggestion,
-    username: App.user.username,
-    createdAt: Date.now(),
-    status: 'open',
-  });
-  saveErrata(bookId, errata);
-  closeAllModals();
-  renderErrataPanel(bookId);
-}
-
-function markErrataFixed(bookId, errataId, e) {
-  e.stopPropagation();
-  const errata = getErrata(bookId);
-  const item = errata.find(er => er.id === errataId);
-  if (item) { item.status = item.status === 'fixed' ? 'open' : 'fixed'; }
-  saveErrata(bookId, errata);
-  renderErrataPanel(bookId);
-}
-
-function deleteErrata(bookId, errataId, e) {
-  e.stopPropagation();
-  let errata = getErrata(bookId);
-  errata = errata.filter(er => er.id !== errataId);
-  saveErrata(bookId, errata);
-  renderErrataPanel(bookId);
-}
-
-function renderErrataPanel(bookId) {
-  const allNovels = getAllNovels(); const book = allNovels.find(n => n.id === bookId);
-  if (!book) { document.getElementById('errata-section').innerHTML = ''; return; }
-  const errata = getErrata(bookId);
-  const isAuthor = book.isUploaded && App.user && App.user.username === book.uploadedBy;
-  const openCount = errata.filter(e => e.status === 'open').length;
-
-  let html = '<div class="errata-header"><span>📝 纠错反馈';
-  if (openCount > 0) html += ' <span style="color:#e74c3c;font-size:12px">(' + openCount + '条未处理)</span>';
-  html += '</span>';
-  html += '<button class="top-btn" onclick="showErrataForm()">+ 提交纠错</button>';
-  html += '</div>';
-
-  if (errata.length === 0) {
-    html += '<p style="color:var(--text2);font-size:12px;text-align:center;padding:10px 0">暂无纠错反馈</p>';
-  } else {
-    errata.forEach(er => {
-      const d = new Date(er.createdAt);
-      const timeStr = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-      html += '<div class="errata-item">';
-      html += '<div class="errata-meta">' + escapeHtml(er.username) + ' · ' + escapeHtml(er.chapterTitle) + ' · ' + timeStr + ' <span class="errata-status ' + er.status + '">' + (er.status==='open'?'待处理':'已修复') + '</span></div>';
-      html += '<div class="errata-desc">' + escapeHtml(er.description) + '</div>';
-      if (er.suggestion) html += '<div class="errata-suggestion">💡 建议：' + escapeHtml(er.suggestion) + '</div>';
-      if (isAuthor) {
-        html += '<div class="errata-actions"><button class="top-btn" style="font-size:10px;padding:2px 8px" onclick="markErrataFixed(\''+bookId+'\',\''+er.id+'\',event)">' + (er.status==='open'?'✓ 标记已修复':'↩ 重新打开') + '</button><button class="top-btn" style="font-size:10px;padding:2px 8px;color:#c0392b" onclick="deleteErrata(\''+bookId+'\',\''+er.id+'\',event)">删除</button></div>';
-      }
-      html += '</div>';
-    });
-  }
-  document.getElementById('errata-section').innerHTML = html;
-}
-function getComments(bookId) {
-  try { return JSON.parse(localStorage.getItem('novel_comments_' + bookId)) || []; } catch(e) { return []; }
-}
-function saveComments(bookId, comments) { localStorage.setItem('novel_comments_' + bookId, JSON.stringify(comments)); }
-
-function postComment() {
-  if (!App.user) { showAuthModal('login'); return; }
-  const textarea = document.getElementById('comment-input');
-  const text = textarea.value.trim();
-  if (!text) return;
-  const bookId = App.currentBookId;
-  const comments = getComments(bookId);
-  comments.unshift({ username: App.user.username, text, createdAt: Date.now(), id: 'c' + Date.now() });
-  saveComments(bookId, comments);
-  textarea.value = '';
-  renderComments(bookId);
-}
-
-function renderComments(bookId) {
-  const comments = getComments(bookId);
-  let html = '<div class="comments-header">💬 读者评论 (' + comments.length + ')</div>';
-  if (App.user) {
-    html += `<div class="comment-form"><textarea id="comment-input" placeholder="写下你的评论..."></textarea><button class="comment-submit" onclick="postComment()">发表</button></div>`;
-  } else {
-    html += '<p style="font-size:12px;color:var(--text2);margin-bottom:12px">请<a style="color:var(--accent);cursor:pointer;text-decoration:underline" onclick="showAuthModal(\'login\')">登录</a>后发表评论</p>';
-  }
-  if (comments.length === 0) {
-    html += '<p style="color:var(--text2);font-size:13px;text-align:center;padding:20px 0">暂无评论，来说两句吧</p>';
-  } else {
-    html += '<div class="comment-list">';
-    comments.forEach(c => {
-      const d = new Date(c.createdAt);
-      const timeStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
-      html += '<div class="comment-item"><div class="comment-user">'+escapeHtml(c.username)+'</div><div class="comment-text">'+escapeHtml(c.text)+'</div><div class="comment-time">'+timeStr+'</div></div>';
-    });
-    html += '</div>';
-  }
-  document.getElementById('comments-section').innerHTML = html;
-}
-
-// ==================== Ratings ====================
-function getRatings(bookId) {
-  try { return JSON.parse(localStorage.getItem('novel_ratings_' + bookId)) || {}; } catch(e) { return {}; }
-}
-function saveRatings(bookId, ratings) { localStorage.setItem('novel_ratings_' + bookId, JSON.stringify(ratings)); }
-
-function getAvgRating(bookId) {
-  const ratings = getRatings(bookId);
-  const scores = Object.values(ratings);
-  if (scores.length === 0) return 0;
-  return Math.round((scores.reduce((a,b) => a + b, 0) / scores.length) * 10) / 10;
-}
-
-function getRatingCount(bookId) {
-  return Object.keys(getRatings(bookId)).length;
-}
-
-function getUserRating(bookId) {
-  if (!App.user) return null;
-  const ratings = getRatings(bookId);
-  return ratings[App.user.username] || null;
-}
-
-function submitRating(bookId, score) {
-  if (!App.user) { showAuthModal('login'); return; }
-  const ratings = getRatings(bookId);
-  ratings[App.user.username] = score;
-  saveRatings(bookId, ratings);
-  renderRating(bookId);
-  renderBookGrid();
-}
-
-function renderRating(bookId) {
-  const avg = getAvgRating(bookId);
-  const count = getRatingCount(bookId);
-  const myScore = getUserRating(bookId);
-
-  let html = '<div class="rating-header">⭐ 小说评分</div>';
-  html += '<div class="rating-current">综合评分：<b style="color:var(--star);font-size:18px">' + (avg > 0 ? avg.toFixed(1) : '暂无') + '</b> / 10 （' + count + '人评分）';
-  if (myScore) html += ' &nbsp;你的评分：<b style="color:var(--accent)">' + myScore + '</b>';
-  html += '</div>';
-
-  if (App.user) {
-    html += '<div class="rating-stars">';
-    for (let i = 1; i <= 10; i++) {
-      html += '<button class="rating-star' + (myScore === i ? ' my-score' : '') + '" onclick="submitRating(\'' + bookId + '\',' + i + ')">' + i + '</button>';
-    }
-    html += '</div>';
-  } else {
-    html += '<p style="font-size:12px;color:var(--text2)">请<a style="color:var(--accent);cursor:pointer;text-decoration:underline" onclick="showAuthModal(\'login\')">登录</a>后评分</p>';
-  }
-  document.getElementById('rating-section').innerHTML = html;
-}
-
-// ==================== App state ====================
-let App = {
-  currentBookId: null, currentChapterIdx: 0, sidebarCollapsed: false,
-  currentCategory: '全部', searchQuery: '',
-  settings: { fontSize:17, lineHeight:2.0, theme:'light', fontFamily:'song' },
-  bookmarks: {}, user: null,
-};
+// ==================== App State ====================
+let App={currentBookId:null,currentChapterIdx:0,sidebarCollapsed:false,currentCategory:'全部',searchQuery:'',settings:{fontSize:17,lineHeight:2.0,theme:'light',fontFamily:'song'},bookmarks:{},user:null,myTab:'bookshelf',bannerIdx:0,bannerTimer:null};
 
 // ==================== Auth ====================
 function getUsers(){try{return JSON.parse(localStorage.getItem('novel_users'))||{};}catch(e){return{};}}
 function saveUsers(u){localStorage.setItem('novel_users',JSON.stringify(u));}
 function getCurrentUser(){try{return JSON.parse(localStorage.getItem('novel_cur_user'));}catch(e){return null;}}
-
-function showAuthModal(type){
-  closeAllModals();
-  document.getElementById('modal-overlay').classList.add('show');
-  if(type==='login'){
-    document.getElementById('modal-login').classList.add('show');
-    document.getElementById('login-error').textContent='';
-    document.getElementById('login-username').value='';
-    document.getElementById('login-password').value='';
-    setTimeout(()=>document.getElementById('login-username').focus(),100);
-  }else{
-    document.getElementById('modal-register').classList.add('show');
-    document.getElementById('reg-error').textContent='';
-    document.getElementById('reg-username').value='';
-    document.getElementById('reg-password').value='';
-    document.getElementById('reg-password2').value='';
-    setTimeout(()=>document.getElementById('reg-username').focus(),100);
-  }
-}
-
-async function doRegister(){
-  const uname=document.getElementById('reg-username').value.trim();
-  const pw=document.getElementById('reg-password').value;
-  const pw2=document.getElementById('reg-password2').value;
-  const errEl=document.getElementById('reg-error');
-  if(!/^[\w一-鿿]{3,16}$/u.test(uname)){errEl.textContent='用户名需3-16位（字母、数字、下划线、中文）';return;}
-  if(pw.length<6){errEl.textContent='密码至少6位';return;}
-  if(/[一-鿿]/.test(pw)){errEl.textContent='密码不能包含中文';return;}
-  if(pw!==pw2){errEl.textContent='两次密码不一致';return;}
-  const users=getUsers();
-  if(users[uname]){errEl.textContent='用户名已存在';return;}
-  users[uname]={password:await sha256(pw),createdAt:Date.now()};
-  saveUsers(users);
-  migrateGuestData(uname);
-  loginAs(uname);
-  closeAllModals();
-}
-
-async function doLogin(){
-  const uname=document.getElementById('login-username').value.trim();
-  const pw=document.getElementById('login-password').value;
-  const errEl=document.getElementById('login-error');
-  if(!uname){errEl.textContent='请输入用户名';return;}
-  const users=getUsers();
-  if(!users[uname]){errEl.textContent='用户名不存在';return;}
-  if(users[uname].password!==await sha256(pw)){errEl.textContent='密码错误';return;}
-  migrateGuestData(uname);
-  loginAs(uname);
-  closeAllModals();
-}
-
-function loginAs(username){
-  App.user={username};
-  localStorage.setItem('novel_cur_user',JSON.stringify(App.user));
-  const ukey='novel_bookmarks_'+username;
-  const pkey='novel_lastpos_'+username;
-  try{App.bookmarks=JSON.parse(localStorage.getItem(ukey))||{};}catch(e){App.bookmarks={};}
-  const saved=(()=>{try{return JSON.parse(localStorage.getItem(pkey));}catch(e){return null;}})();
-  if(saved){App.currentBookId=saved.bookId;App.currentChapterIdx=saved.chapterIdx;}
-  updateAuthUI();
-  renderBookshelf();
-  if(App.currentBookId&&document.getElementById('reader').classList.contains('active')){
-    openReader(App.currentBookId,App.currentChapterIdx);
-  }
-}
-
-function logout(){
-  App.user=null;
-  localStorage.removeItem('novel_cur_user');
-  App.bookmarks={};
-  try{App.bookmarks=JSON.parse(localStorage.getItem('novel_bookmarks_guest'))||{};}catch(e){App.bookmarks={};}
-  try{const pos=JSON.parse(localStorage.getItem('novel_lastpos_guest'));if(pos){App.currentBookId=pos.bookId;App.currentChapterIdx=pos.chapterIdx;}}catch(e){}
-  document.getElementById('user-menu').classList.remove('show');
-  updateAuthUI();
-  renderBookshelf();
-}
-
-function migrateGuestData(username){
-  const guestBm=localStorage.getItem('novel_bookmarks_guest');
-  const guestPos=localStorage.getItem('novel_lastpos_guest');
-  if(guestBm){localStorage.setItem('novel_bookmarks_'+username,guestBm);localStorage.removeItem('novel_bookmarks_guest');}
-  if(guestPos){localStorage.setItem('novel_lastpos_'+username,guestPos);localStorage.removeItem('novel_lastpos_guest');}
-}
-
-function updateAuthUI(){
-  if(App.user){
-    document.getElementById('btn-login').style.display='none';
-    document.getElementById('btn-register').style.display='none';
-    document.getElementById('user-dropdown').style.display='';
-    document.getElementById('username-display').textContent=App.user.username;
-  }else{
-    document.getElementById('btn-login').style.display='';
-    document.getElementById('btn-register').style.display='';
-    document.getElementById('user-dropdown').style.display='none';
-  }
-}
-
-function toggleUserMenu(){document.getElementById('user-menu').classList.toggle('show');}
-document.addEventListener('click',function(e){if(!e.target.closest('#user-dropdown'))document.getElementById('user-menu').classList.remove('show');});
-
-// ==================== Bookshelf (favorites) ====================
-function getBookshelfData() {
-  const key = App.user ? 'novel_bookshelf_' + App.user.username : 'novel_bookshelf_guest';
-  try { return JSON.parse(localStorage.getItem(key)) || []; } catch(e) { return []; }
-}
-function saveBookshelfData(data) {
-  const key = App.user ? 'novel_bookshelf_' + App.user.username : 'novel_bookshelf_guest';
-  localStorage.setItem(key, JSON.stringify(data));
-}
-function isOnBookshelf(bookId) {
-  return getBookshelfData().includes(bookId);
-}
-function toggleBookshelfItem(bookId, e) {
-  if (e) e.stopPropagation();
-  if (!App.user) { showAuthModal('login'); return; }
-  const shelf = getBookshelfData();
-  const idx = shelf.indexOf(bookId);
-  if (idx >= 0) { shelf.splice(idx, 1); }
-  else { shelf.push(bookId); }
-  saveBookshelfData(shelf);
-  // Refresh current display
-  if (document.getElementById('bookshelf-view').style.display !== 'none') {
-    renderBookshelfView();
-  } else {
-    renderBookGrid();
-  }
-  if (App.currentBookId === bookId) {
-    renderChapterContent(getAllNovels().find(n=>n.id===bookId), App.currentChapterIdx);
-  }
-}
-function showBookshelf() {
-  if (!App.user) { showAuthModal('login'); return; }
-  document.getElementById('bookshelf').classList.add('hidden');
-  document.getElementById('bookshelf').classList.remove('hidden'); // keep visible
-  // Actually just show bookshelf view
-  document.getElementById('category-tabs').style.display = 'none';
-  document.getElementById('category-tabs').nextElementSibling.style.display = 'none'; // the bookshelf button
-  document.getElementById('recommended-section').style.display = 'none';
-  document.getElementById('book-grid').style.display = 'none';
-  document.getElementById('no-results').style.display = 'none';
-  document.getElementById('bookshelf-view').style.display = '';
-  renderBookshelfView();
-  document.getElementById('bookshelf').scrollIntoView({behavior:'smooth'});
-}
-function renderBookshelfView() {
-  const shelf = getBookshelfData();
-  const allNovels = getAllNovels();
-  const books = allNovels.filter(n => shelf.includes(n.id));
-  document.getElementById('bookshelf-count').textContent = '共收藏 ' + books.length + ' 本小说';
-  const grid = document.getElementById('bookshelf-grid');
-  if (books.length === 0) {
-    grid.innerHTML = '<p style="text-align:center;color:var(--text2);padding:40px">还没有收藏任何小说<br>点击书籍封面上的 ❤️ 按钮收藏吧</p>';
-    return;
-  }
-  const pos = getLastPosition();
-  let html = '';
-  books.forEach(book => {
-    const progress = (pos && pos.bookId === book.id) ? Math.round((pos.chapterIdx+1)/book.chapters.length*100) : 0;
-    const avg = getAvgRating(book.id); const rCount = getRatingCount(book.id);
-    const coverGrad = book.cover || COVER_GRADIENTS[book.category] || 'linear-gradient(135deg,#555,#777)';
-    const coverEmoji = book.emoji || COVER_EMOJI[book.category] || '📖';
-    const catName = Object.entries(CAT_MAP).find(([k,v]) => v === book.category)?.[0] || book.category;
-    html += '<div class="book-card" onclick="openReader(\''+book.id+'\','+(progress>0&&pos?.bookId===book.id?pos.chapterIdx:0)+')">'+
-      '<div class="book-cover" style="background:'+coverGrad+'"><span class="cover-text">'+coverEmoji+'<br>'+escapeHtml(book.title)+'</span>'+
-      '<span class="cat-badge">'+catName+'</span>'+
-      (avg>0?'<div class="rating-badge"><span class="rating-num">'+avg.toFixed(1)+'</span> 分 <span class="rating-count">('+rCount+'评)</span></div>':'')+
-      '<div class="author-actions" style="top:8px;left:auto;right:8px;bottom:auto"><button class="aa-btn aa-del" style="font-size:14px;padding:4px 8px" onclick="toggleBookshelfItem(\''+book.id+'\',event)">❤️ 取消收藏</button></div>'+
-      '</div>'+
-      '<div class="book-info"><h3>'+escapeHtml(book.title)+'</h3><div class="author">'+escapeHtml(book.author)+' 著 · '+book.chapters.length+'章</div>'+
-      (progress>0?'<div class="progress-bar"><div class="fill" style="width:'+progress+'%"></div></div><div class="progress-label">已读 '+progress+'%</div>':'')+
-      '</div></div>';
-  });
-  grid.innerHTML = html;
-}
+function showAuthModal(type){closeAllModals();document.getElementById('modal-overlay').classList.add('show');if(type==='login'){document.getElementById('modal-login').classList.add('show');document.getElementById('login-error').textContent='';document.getElementById('login-username').value='';document.getElementById('login-password').value='';}else{document.getElementById('modal-register').classList.add('show');document.getElementById('reg-error').textContent='';document.getElementById('reg-username').value='';document.getElementById('reg-password').value='';document.getElementById('reg-password2').value='';}}
+async function doRegister(){const u=document.getElementById('reg-username').value.trim();const p=document.getElementById('reg-password').value;const p2=document.getElementById('reg-password2').value;const e=document.getElementById('reg-error');if(!/^[\w一-鿿]{3,16}$/u.test(u)){e.textContent='用户名需3-16位';return;}if(p.length<6){e.textContent='密码至少6位';return;}if(/[一-鿿]/.test(p)){e.textContent='密码不能包含中文';return;}if(p!==p2){e.textContent='两次密码不一致';return;}const users=getUsers();if(users[u]){e.textContent='用户名已存在';return;}users[u]={password:await sha256(p),createdAt:Date.now()};saveUsers(users);loginAs(u);closeAllModals();}
+async function doLogin(){const u=document.getElementById('login-username').value.trim();const p=document.getElementById('login-password').value;const e=document.getElementById('login-error');if(!u){e.textContent='请输入用户名';return;}const users=getUsers();if(!users[u]){e.textContent='用户名不存在';return;}if(users[u].password!==await sha256(p)){e.textContent='密码错误';return;}loginAs(u);closeAllModals();}
+function loginAs(username){App.user={username};localStorage.setItem('novel_cur_user',JSON.stringify(App.user));loadBookmarks();const pos=getLastPosition();if(pos){App.currentBookId=pos.bookId;App.currentChapterIdx=pos.chapterIdx;}updateAuthUI();goHome();}
+function logout(){App.user=null;localStorage.removeItem('novel_cur_user');App.bookmarks={};try{App.bookmarks=JSON.parse(localStorage.getItem('novel_bookmarks_guest'))||{};}catch(e){App.bookmarks={};}updateAuthUI();goHome();}
+function updateAuthUI(){if(App.user){document.getElementById('btn-login').style.display='none';document.getElementById('btn-register').style.display='none';document.getElementById('btn-logout').style.display='';document.getElementById('nav-my').style.display='';}else{document.getElementById('btn-login').style.display='';document.getElementById('btn-register').style.display='';document.getElementById('btn-logout').style.display='none';document.getElementById('nav-my').style.display='none';}}
 
 // ==================== Storage helpers ====================
 function storageKey(prefix){return App.user?prefix+'_'+App.user.username:prefix+'_guest';}
-
-// ==================== Bookmarks ====================
 function loadBookmarks(){try{App.bookmarks=JSON.parse(localStorage.getItem(storageKey('novel_bookmarks')))||{};}catch(e){App.bookmarks={};}}
 function saveBookmarks(){localStorage.setItem(storageKey('novel_bookmarks'),JSON.stringify(App.bookmarks));}
-function getBmKey(bookId,chIdx){return bookId+'-'+chIdx;}
-function toggleBookmark(){
-  if(!App.currentBookId)return;
-  const key=getBmKey(App.currentBookId,App.currentChapterIdx);
-  if(App.bookmarks[key]){delete App.bookmarks[key];saveBookmarks();renderBookmarkPanel();renderBookmarksMini();}
-  else{
-    const allNovels=getAllNovels();const book=allNovels.find(n=>n.id===App.currentBookId);
-    const ch=book.chapters[App.currentChapterIdx];
-    App.bookmarks[key]={bookId:App.currentBookId,chapterIdx:App.currentChapterIdx,chapterTitle:ch.title,bookTitle:book.title,time:new Date().toLocaleString('zh-CN')};
-    saveBookmarks();renderBookmarkPanel();renderBookmarksMini();
-    document.getElementById('btn-bookmark').textContent='🔖 已添加书签';
-    setTimeout(()=>{document.getElementById('btn-bookmark').textContent='🔖 添加书签';},1500);
-  }
-}
-
-// ==================== Reading position ====================
+function getBmKey(bId,cIdx){return bId+'-'+cIdx;}
 function saveLastPosition(){if(!App.currentBookId)return;localStorage.setItem(storageKey('novel_lastpos'),JSON.stringify({bookId:App.currentBookId,chapterIdx:App.currentChapterIdx}));}
 function getLastPosition(){try{return JSON.parse(localStorage.getItem(storageKey('novel_lastpos')));}catch(e){return null;}}
 
-// ==================== Bookshelf rendering ====================
-function onSearch(){App.searchQuery=document.getElementById('search-input').value.trim().toLowerCase();renderBookGrid();}
-function filterCategory(cat){App.currentCategory=cat;renderBookshelf();}
+// ==================== Bookshelf ====================
+function getBookshelfData(){try{return JSON.parse(localStorage.getItem(storageKey('novel_bookshelf')))||[];}catch(e){return[];}}
+function saveBookshelfData(d){localStorage.setItem(storageKey('novel_bookshelf'),JSON.stringify(d));}
+function isOnBookshelf(bId){return getBookshelfData().includes(bId);}
+function toggleBookshelfItem(bId,e){if(e)e.stopPropagation();if(!App.user){showAuthModal('login');return;}const s=getBookshelfData();const i=s.indexOf(bId);if(i>=0)s.splice(i,1);else s.push(bId);saveBookshelfData(s);if(document.getElementById('my-page').classList.contains('show'))renderMyBookshelf();renderHomepage();if(App.currentBookId===bId)renderChapterContent(getAllNovels().find(n=>n.id===bId),App.currentChapterIdx);}
 
-function getFilteredBooks(){
-  let books=getAllNovels();
-  if(App.currentCategory==='推荐'){
-    books=books.filter(b=>getAvgRating(b.id)>=7).sort((a,b)=>getAvgRating(b.id)-getAvgRating(a.id));
-    if(App.searchQuery){const q=App.searchQuery;books=books.filter(b=>b.title.toLowerCase().includes(q)||b.author.toLowerCase().includes(q)||b.desc.toLowerCase().includes(q));}
-    return books;
-  }
-  if(App.currentCategory!=='全部'){books=books.filter(b=>b.category===CAT_MAP[App.currentCategory]);}
-  if(App.searchQuery){const q=App.searchQuery;books=books.filter(b=>b.title.toLowerCase().includes(q)||b.author.toLowerCase().includes(q)||b.desc.toLowerCase().includes(q));}
-  return books;
+// ==================== Bookmarks ====================
+function toggleBookmark(){if(!App.currentBookId)return;const k=getBmKey(App.currentBookId,App.currentChapterIdx);if(App.bookmarks[k]){delete App.bookmarks[k];saveBookmarks();renderMyBookmarks();}else{const b=getAllNovels().find(n=>n.id===App.currentBookId);const ch=b.chapters[App.currentChapterIdx];App.bookmarks[k]={bookId:App.currentBookId,chapterIdx:App.currentChapterIdx,chapterTitle:ch.title,bookTitle:b.title,time:new Date().toLocaleString('zh-CN')};saveBookmarks();renderMyBookmarks();}renderChapterContent(getAllNovels().find(n=>n.id===App.currentBookId),App.currentChapterIdx);}
+function deleteBookmark(k){delete App.bookmarks[k];saveBookmarks();renderMyBookmarks();}
+
+// ==================== Ratings ====================
+function getRatings(bId){try{return JSON.parse(localStorage.getItem('novel_ratings_'+bId))||{};}catch(e){return{};}}
+function saveRatings(bId,r){localStorage.setItem('novel_ratings_'+bId,JSON.stringify(r));}
+function getAvgRating(bId){const r=getRatings(bId);const s=Object.values(r);if(s.length===0)return 0;return Math.round((s.reduce((a,b)=>a+b,0)/s.length)*10)/10;}
+function getRatingCount(bId){return Object.keys(getRatings(bId)).length;}
+function getUserRating(bId){if(!App.user)return null;const r=getRatings(bId);return r[App.user.username]||null;}
+function submitRating(bId,score){if(!App.user){showAuthModal('login');return;}const r=getRatings(bId);r[App.user.username]=score;saveRatings(bId,r);renderRating(bId);renderHomepage();}
+
+// ==================== Comments ====================
+function getComments(bId){try{return JSON.parse(localStorage.getItem('novel_comments_'+bId))||[];}catch(e){return[];}}
+function saveComments(bId,c){localStorage.setItem('novel_comments_'+bId,JSON.stringify(c));}
+function postComment(){if(!App.user){showAuthModal('login');return;}const ta=document.getElementById('comment-input');const t=ta.value.trim();if(!t)return;const cs=getComments(App.currentBookId);cs.unshift({username:App.user.username,text:t,createdAt:Date.now(),id:'c'+Date.now()});saveComments(App.currentBookId,cs);ta.value='';renderComments(App.currentBookId);}
+
+// ==================== Errata ====================
+function getErrata(bId){try{return JSON.parse(localStorage.getItem('novel_errata_'+bId))||[];}catch(e){return[];}}
+function saveErrata(bId,e){localStorage.setItem('novel_errata_'+bId,JSON.stringify(e));}
+function showErrataForm(){if(!App.user){showAuthModal('login');return;}const b=getAllNovels().find(n=>n.id===App.currentBookId);if(!b)return;const ch=b.chapters[App.currentChapterIdx];closeAllModals();document.getElementById('modal-overlay').classList.add('show');document.getElementById('modal-errata').classList.add('show');document.getElementById('errata-chapter').value=ch.title;document.getElementById('errata-desc').value='';document.getElementById('errata-suggestion').value='';document.getElementById('errata-error').textContent='';}
+function submitErrata(){const d=document.getElementById('errata-desc').value.trim();const s=document.getElementById('errata-suggestion').value.trim();const e=document.getElementById('errata-error');if(!d){e.textContent='请描述发现的错误';return;}const bId=App.currentBookId;const ch=getAllNovels().find(n=>n.id===bId).chapters[App.currentChapterIdx];const er=getErrata(bId);er.unshift({id:'e'+Date.now(),chapterIdx:App.currentChapterIdx,chapterTitle:ch.title,description:d,suggestion:s,username:App.user.username,createdAt:Date.now(),status:'open'});saveErrata(bId,er);closeAllModals();renderErrataPanel(bId);}
+function markErrataFixed(bId,eId,ev){ev.stopPropagation();const er=getErrata(bId);const it=er.find(e=>e.id===eId);if(it)it.status=it.status==='fixed'?'open':'fixed';saveErrata(bId,er);renderErrataPanel(bId);}
+function deleteErrata(bId,eId,ev){ev.stopPropagation();let er=getErrata(bId);er=er.filter(e=>e.id!==eId);saveErrata(bId,er);renderErrataPanel(bId);}
+
+// ==================== Upload / Edit ====================
+function getUploadedNovels(){try{return JSON.parse(localStorage.getItem('novel_uploads'))||[];}catch(e){return[];}}
+function saveUploadedNovels(n){localStorage.setItem('novel_uploads',JSON.stringify(n));}
+function addChapterField(){const c=document.getElementById('chapter-editors');const n=c.querySelectorAll('.chapter-editor').length+1;const d=document.createElement('div');d.className='chapter-editor';d.innerHTML='<div class="ch-header"><span>第'+n+'章</span><button onclick="this.closest(\'.chapter-editor\').remove()">✕</button></div><input type="text" class="ch-title" placeholder="章节标题（可选）" style="width:100%;margin-bottom:6px;padding:7px 10px;border:1px solid var(--divider);border-radius:6px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit"><textarea class="ch-content" placeholder="请输入章节内容..." style="width:100%;min-height:100px;padding:8px;border:1px solid var(--divider);border-radius:6px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;resize:vertical"></textarea>';c.appendChild(d);}
+function showUploadModal(){if(!App.user){showAuthModal('login');return;}document.getElementById('modal-upload').dataset.editId='';document.getElementById('upload-modal-title').textContent='📝 投稿小说';document.getElementById('upload-submit-btn').textContent='提交投稿';document.getElementById('upload-submit-btn').onclick=submitNovel;closeAllModals();document.getElementById('modal-overlay').classList.add('show');document.getElementById('modal-upload').classList.add('show');document.getElementById('up-title').value='';document.getElementById('up-author').value='';document.getElementById('up-desc').value='';document.getElementById('up-error').textContent='';document.getElementById('chapter-editors').innerHTML='<div class="chapter-editor"><div class="ch-header"><span>第1章</span></div><input type="text" class="ch-title" placeholder="章节标题（可选）" style="width:100%;margin-bottom:6px;padding:7px 10px;border:1px solid var(--divider);border-radius:6px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit"><textarea class="ch-content" placeholder="请输入章节内容..." style="width:100%;min-height:100px;padding:8px;border:1px solid var(--divider);border-radius:6px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;resize:vertical"></textarea></div>';}
+function submitNovel(){const t=document.getElementById('up-title').value.trim();const a=document.getElementById('up-author').value.trim();const cat=document.getElementById('up-category').value;const desc=document.getElementById('up-desc').value.trim();const ee=document.getElementById('up-error');if(!t){ee.textContent='请输入书名';return;}if(!a){ee.textContent='请输入作者笔名';return;}const eds=document.querySelectorAll('#chapter-editors .chapter-editor');const chs=[];eds.forEach((ed,i)=>{const ct=ed.querySelector('.ch-title').value.trim()||'第'+(i+1)+'章';const cc=ed.querySelector('.ch-content').value.trim();if(cc)chs.push({id:'ch'+(i+1),title:'第'+(i+1)+'章  '+ct,content:cc.split('\n').filter(l=>l.trim())});});if(chs.length===0){ee.textContent='请至少填写一章内容';return;}const novel={id:'upload_'+Date.now(),title:t,author:a,category:cat,desc:desc,cover:COVER_GRADIENTS[cat],emoji:COVER_EMOJI[cat],chapters:chs,uploadedBy:App.user.username,uploadedAt:Date.now(),isUploaded:true};const up=getUploadedNovels();up.unshift(novel);saveUploadedNovels(up);closeAllModals();goHome();}
+function editNovel(bId){if(!App.user)return;const up=getUploadedNovels();const n=up.find(x=>x.id===bId);if(!n||n.uploadedBy!==App.user.username)return;closeAllModals();document.getElementById('modal-overlay').classList.add('show');document.getElementById('modal-upload').classList.add('show');document.getElementById('modal-upload').dataset.editId=bId;document.getElementById('upload-modal-title').textContent='✎ 编辑作品';document.getElementById('upload-submit-btn').textContent='保存修改';document.getElementById('upload-submit-btn').onclick=submitEdit;document.getElementById('up-title').value=n.title;document.getElementById('up-author').value=n.author;document.getElementById('up-category').value=n.category;document.getElementById('up-desc').value=n.desc||'';document.getElementById('up-error').textContent='';const c=document.getElementById('chapter-editors');c.innerHTML=n.chapters.map((ch,i)=>'<div class="chapter-editor"><div class="ch-header"><span>第'+(i+1)+'章</span>'+(i>0?'<button onclick="this.closest(\'.chapter-editor\').remove()">✕</button>':'')+'</div><input type="text" class="ch-title" value="'+ch.title.replace(/"/g,'&quot;')+'" style="width:100%;margin-bottom:6px;padding:7px 10px;border:1px solid var(--divider);border-radius:6px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit"><textarea class="ch-content" style="width:100%;min-height:100px;padding:8px;border:1px solid var(--divider);border-radius:6px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;resize:vertical">'+ch.content.join('\n')+'</textarea></div>').join('');}
+function submitEdit(){const bId=document.getElementById('modal-upload').dataset.editId;const t=document.getElementById('up-title').value.trim();const a=document.getElementById('up-author').value.trim();const cat=document.getElementById('up-category').value;const desc=document.getElementById('up-desc').value.trim();const ee=document.getElementById('up-error');if(!t){ee.textContent='请输入书名';return;}if(!a){ee.textContent='请输入作者笔名';return;}const eds=document.querySelectorAll('#chapter-editors .chapter-editor');const chs=[];eds.forEach((ed,i)=>{const ct=ed.querySelector('.ch-title').value.trim()||('第'+(i+1)+'章');const cc=ed.querySelector('.ch-content').value.trim();if(cc)chs.push({id:'ch'+(i+1),title:'第'+(i+1)+'章  '+ct,content:cc.split('\n').filter(l=>l.trim())});});if(chs.length===0){ee.textContent='请至少保留一章内容';return;}const up=getUploadedNovels();const n=up.find(x=>x.id===bId);if(!n)return;n.title=t;n.author=a;n.category=cat;n.desc=desc;n.chapters=chs;n.cover=COVER_GRADIENTS[cat];n.emoji=COVER_EMOJI[cat];saveUploadedNovels(up);closeAllModals();goHome();if(App.currentBookId===bId)openReader(bId,App.currentChapterIdx);}
+function deleteNovel(bId){if(!App.user)return;const up=getUploadedNovels();const n=up.find(x=>x.id===bId);if(!n||n.uploadedBy!==App.user.username)return;if(!confirm('确定要删除《'+n.title+'》吗？此操作不可撤销！'))return;const i=up.indexOf(n);up.splice(i,1);saveUploadedNovels(up);localStorage.removeItem('novel_comments_'+bId);localStorage.removeItem('novel_ratings_'+bId);localStorage.removeItem('novel_errata_'+bId);Object.keys(App.bookmarks).forEach(k=>{if(App.bookmarks[k].bookId===bId)delete App.bookmarks[k];});saveBookmarks();if(App.currentBookId===bId)goHome();goHome();}
+
+// ==================== Render helpers ====================
+function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function highlightText(t,q){if(!q)return escapeHtml(t);const e=escapeHtml(t);const re=new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');return e.replace(re,'<mark>$1</mark>');}
+function onSearch(){App.searchQuery=document.getElementById('search-input').value.trim().toLowerCase();renderHomepage();}
+
+// ==================== Homepage ====================
+function goHome(){document.getElementById('reader').classList.remove('active');document.getElementById('float-toolbar').style.display='none';document.getElementById('my-page').classList.remove('show');document.getElementById('homepage').style.display='';App.currentBookId=null;startBanner();renderHomepage();}
+function renderHomepage(){renderBanner();renderRecSection();renderNewSection();renderCatSection();renderAllBooks();}
+
+function renderBanner(){
+  const books=getAllNovels().filter(b=>getAvgRating(b.id)>=7).sort((a,b)=>getAvgRating(b.id)-getAvgRating(a.id)||getRatingCount(b.id)-getRatingCount(a.id)).slice(0,5);
+  if(books.length===0){document.getElementById('banner').style.display='none';return;}
+  document.getElementById('banner').style.display='';
+  let html='<div class="banner-track" id="banner-track" style="transform:translateX(-'+App.bannerIdx+'00%)">';
+  books.forEach((b,i)=>{
+    const grad=b.cover||COVER_GRADIENTS[b.category];
+    const avg=getAvgRating(b.id);const rc=getRatingCount(b.id);
+    html+='<div class="banner-slide" onclick="openReader(\''+b.id+'\',0)" style="background:'+grad+'"><div class="banner-bg" style="background:'+grad+'"></div><div class="banner-content"><div class="banner-cover" style="background:rgba(255,255,255,.15)">'+COVER_EMOJI[b.category]+'</div><div class="banner-info"><h2>'+escapeHtml(b.title)+'</h2><div class="banner-author">'+escapeHtml(b.author)+' 著 · ⭐'+avg.toFixed(1)+' ('+rc+'评)</div><div class="banner-desc">'+(b.desc||'')+'</div><span class="banner-btn">立即阅读 →</span></div></div></div>';
+  });
+  html+='</div><div class="banner-dots">';
+  books.forEach((_,i)=>{html+='<span class="banner-dot'+(i===App.bannerIdx?' active':'')+'" onclick="App.bannerIdx='+i+';renderBanner();"></span>';});
+  html+='</div><button class="banner-arrow left" onclick="App.bannerIdx=(App.bannerIdx-1+'+books.length+')%'+books.length+';renderBanner();">◀</button><button class="banner-arrow right" onclick="App.bannerIdx=(App.bannerIdx+1)%'+books.length+';renderBanner();">▶</button>';
+  document.getElementById('banner').innerHTML=html;
 }
 
-function escapeHtml(str){return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function highlightText(text,query){if(!query)return escapeHtml(text);const esc=escapeHtml(text);const re=new RegExp('('+query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');return esc.replace(re,'<mark>$1</mark>');}
+function startBanner(){if(App.bannerTimer)clearInterval(App.bannerTimer);App.bannerTimer=setInterval(()=>{const books=getAllNovels().filter(b=>getAvgRating(b.id)>=7);if(books.length>0){App.bannerIdx=(App.bannerIdx+1)%Math.min(5,books.length);renderBanner();}},5000);}
 
-function renderBookshelf(){
-  // Restore main view
-  document.getElementById('category-tabs').style.display='';
-  try { document.getElementById('category-tabs').nextElementSibling.style.display=''; } catch(e) {}
-  document.getElementById('recommended-section').style.display='';
-  document.getElementById('book-grid').style.display='';
-  document.getElementById('no-results').style.display='';
-  document.getElementById('bookshelf-view').style.display='none';
-  let catHtml='';
-  CATEGORIES.forEach(c=>{catHtml+='<button class="cat-tab'+(App.currentCategory===c?' active':'')+'" onclick="filterCategory(\''+c+'\')">'+c+'</button>';});
+function renderBookCard(book,showFav=true){
+  const avg=getAvgRating(book.id);const rc=getRatingCount(book.id);
+  const grad=book.cover||COVER_GRADIENTS[book.category];
+  const fav=isOnBookshelf(book.id);
+  let h='<div class="book-card" onclick="openReader(\''+book.id+'\',0)"><div class="card-cover" style="background:'+grad+'">';
+  if(showFav&&App.user)h+='<div class="card-actions"><button class="card-fav-btn'+(fav?' faved':'')+'" onclick="toggleBookshelfItem(\''+book.id+'\',event)">'+(fav?'❤️':'🤍')+'</button></div>';
+  h+='<span class="cover-cat">'+Object.entries(CAT_MAP).find(([k,v])=>v===book.category)?.[0]||''+'</span>';
+  if(avg>0)h+='<span class="cover-rating">⭐'+avg.toFixed(1)+'</span>';
+  h+='<span class="cover-emoji">'+(book.emoji||COVER_EMOJI[book.category]||'📖')+'</span></div>';
+  h+='<div class="card-info"><h4>'+escapeHtml(book.title)+'</h4><div class="card-author">'+escapeHtml(book.author)+'</div></div></div>';
+  return h;
+}
+
+function renderRecSection(){
+  const books=getAllNovels().filter(b=>getAvgRating(b.id)>=7).sort((a,b)=>getAvgRating(b.id)-getAvgRating(a.id)||getRatingCount(b.id)-getRatingCount(a.id)).slice(0,10);
+  let h='';books.forEach(b=>{h+=renderBookCard(b);});
+  document.getElementById('rec-scroll').innerHTML=h||'<div class="my-empty">暂无高分书籍</div>';
+}
+
+function renderNewSection(){
+  const books=getAllNovels().slice(-8).reverse();
+  let h='';books.forEach(b=>{h+=renderBookCard(b);});
+  document.getElementById('new-scroll').innerHTML=h||'<div class="my-empty">暂无新书</div>';
+}
+
+function renderCatSection(){
+  let h='';CATEGORIES.forEach(cat=>{
+    const catKey=CAT_MAP[cat];const books=getAllNovels().filter(b=>b.category===catKey).slice(0,3);
+    h+='<div class="cat-block" onclick="filterCategory(\''+cat+'\')"><div class="cat-name">'+COVER_EMOJI[catKey]+' '+cat+' <span style="font-size:11px;color:var(--text2);margin-left:auto">'+books.length+'本 →</span></div><div class="cat-books">';
+    books.forEach(b=>{h+='<div class="cat-mini"><div class="cat-cover-mini" style="background:'+(b.cover||COVER_GRADIENTS[b.category])+'">'+(b.emoji||COVER_EMOJI[b.category])+'</div><div style="font-size:10px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escapeHtml(b.title)+'</div></div>';});
+    if(books.length===0)h+='<div style="font-size:11px;color:var(--text2)">暂无书籍</div>';
+    h+='</div></div>';
+  });
+  document.getElementById('cat-row').innerHTML=h;
+}
+
+function filterCategory(cat){App.currentCategory=cat;renderAllBooks();document.getElementById('book-grid-scroll').scrollIntoView({behavior:'smooth'});}
+function renderAllBooks(){
+  // Category tabs
+  let catHtml='<button class="nav-btn'+(App.currentCategory==='全部'?' active':'')+'" onclick="App.currentCategory=\'全部\';renderAllBooks();">全部</button>';
+  CATEGORIES.forEach(c=>{catHtml+='<button class="nav-btn'+(App.currentCategory===c?' active':'')+'" onclick="filterCategory(\''+c+'\')">'+c+'</button>';});
   document.getElementById('category-tabs').innerHTML=catHtml;
-  renderRecommended();
-  renderBookGrid();
+  // Books
+  let books=getAllNovels();
+  if(App.currentCategory!=='全部')books=books.filter(b=>b.category===CAT_MAP[App.currentCategory]);
+  if(App.searchQuery){const q=App.searchQuery;books=books.filter(b=>b.title.toLowerCase().includes(q)||b.author.toLowerCase().includes(q)||(b.desc||'').toLowerCase().includes(q));}
+  document.getElementById('book-count').textContent='共'+books.length+'本';
+  let h='';books.forEach(b=>{h+=renderBookCard(b);});
+  document.getElementById('book-grid-scroll').innerHTML=h||'';
+  document.getElementById('no-results').style.display=books.length===0?'block':'none';
 }
 
-function renderRecommended(){
-  const section=document.getElementById('recommended-section');
-  // Only show recommended on "全部" tab, not when searching
-  if(App.currentCategory!=='全部'||App.searchQuery){section.style.display='none';return;}
-  const books=getAllNovels().filter(b=>getAvgRating(b.id)>=7).sort((a,b)=>getAvgRating(b.id)-getAvgRating(a.id)||getRatingCount(b.id)-getRatingCount(a.id));
-  if(books.length===0){section.style.display='none';return;}
-  section.style.display='';
-  let html='<div class="rec-header"><span class="rec-icon">⭐</span> 推荐好书 · 高分精选</div><div class="rec-scroll">';
-  books.forEach((book,i)=>{
-    const avg=getAvgRating(book.id);
-    const rCount=getRatingCount(book.id);
-    const coverGrad=book.cover||COVER_GRADIENTS[book.category]||'linear-gradient(135deg,#555,#777)';
-    const coverEmoji=book.emoji||COVER_EMOJI[book.category]||'📖';
-    const catName=Object.entries(CAT_MAP).find(([k,v])=>v===book.category)?.[0]||book.category;
-    html+='<div class="rec-card" onclick="openReader(\''+book.id+'\',0)">'+
-      '<div class="rec-cover" style="background:'+coverGrad+'"><span class="rec-rank">'+(i+1)+'</span><span class="rec-cover-text">'+coverEmoji+'<br>'+escapeHtml(book.title)+'</span><span class="rec-score">⭐'+avg.toFixed(1)+' ('+rCount+'评)</span></div>'+
-      '<div class="rec-info"><h3>'+escapeHtml(book.title)+'</h3><div class="rec-meta">'+escapeHtml(book.author)+' · '+catName+' · '+book.chapters.length+'章</div></div></div>';
-  });
-  html+='</div>';
-  section.innerHTML=html;
-}
-
-function renderBookGrid(){
-  const books=getFilteredBooks();
-  const grid=document.getElementById('book-grid');
-  const noRes=document.getElementById('no-results');
-  if(books.length===0){grid.innerHTML='';noRes.style.display='block';return;}
-  noRes.style.display='none';
-  const pos=getLastPosition();
-  let html='';
-  books.forEach(book=>{
-    const progress=(pos&&pos.bookId===book.id)?Math.round((pos.chapterIdx+1)/book.chapters.length*100):0;
-    const titleHl=highlightText(book.title,App.searchQuery);
-    const authorHl=highlightText(book.author,App.searchQuery);
-    const descHl=highlightText(book.desc||'',App.searchQuery);
-    const catName=Object.entries(CAT_MAP).find(([k,v])=>v===book.category)?.[0]||book.category;
-    const avg=getAvgRating(book.id);
-    const rCount=getRatingCount(book.id);
-    const coverGrad=book.cover||COVER_GRADIENTS[book.category]||'linear-gradient(135deg,#555,#777)';
-    const coverEmoji=book.emoji||COVER_EMOJI[book.category]||'📖';
-    html+='<div class="book-card" onclick="openReader(\''+book.id+'\','+(progress>0&&pos?.bookId===book.id?pos.chapterIdx:0)+')">'+
-      '<div class="book-cover" style="background:'+coverGrad+'"><span class="cover-text">'+coverEmoji+'<br>'+book.title+'</span>'+
-      '<span class="cat-badge">'+catName+'</span>'+
-      (book.isUploaded?'<span class="upload-badge">用户投稿</span>':'')+
-      (avg>0?'<div class="rating-badge"><span class="rating-num">'+avg.toFixed(1)+'</span> 分 <span class="rating-count">('+rCount+'评)</span></div>':'')+
-      (book.isUploaded && App.user && App.user.username === book.uploadedBy ? '<div class="author-actions" onclick="event.stopPropagation()"><button class="aa-btn aa-edit" onclick="editNovel(\''+book.id+'\')">✎ 编辑</button><button class="aa-btn aa-del" onclick="deleteNovel(\''+book.id+'\')">✕ 删除</button></div>' : '')+
-      '<div class="author-actions" style="bottom:8px;right:8px;top:auto" onclick="event.stopPropagation()"><button class="aa-btn" style="background:'+(isOnBookshelf(book.id)?'#e74c3c':'#888')+';font-size:14px;padding:4px 8px" onclick="toggleBookshelfItem(\''+book.id+'\',event)">'+(isOnBookshelf(book.id)?'❤️':'🤍')+'</button></div>'+
-      '</div>'+
-      '<div class="book-info"><h3>'+titleHl+'</h3><div class="author">'+authorHl+' 著 · '+book.chapters.length+'章</div><div class="desc">'+descHl+'</div>'+
-      (progress>0?'<div class="progress-bar"><div class="fill" style="width:'+progress+'%"></div></div><div class="progress-label">已读 '+progress+'%</div>':'')+
-      '</div></div>';
-  });
-  grid.innerHTML=html;
-}
+// ==================== My Page ====================
+function showMyPage(){if(!App.user){showAuthModal('login');return;}document.getElementById('reader').classList.remove('active');document.getElementById('float-toolbar').style.display='none';document.getElementById('homepage').style.display='none';document.getElementById('my-page').classList.add('show');document.getElementById('my-username').textContent=App.user.username;document.getElementById('my-meta').textContent='注册用户';App.myTab='bookshelf';switchMyTab('bookshelf');}
+function switchMyTab(tab){App.myTab=tab;document.querySelectorAll('.my-tab').forEach(t=>t.classList.toggle('active',t.textContent.includes(tab==='bookshelf'?'书架':tab==='bookmarks'?'书签':tab==='uploads'?'投稿':'设置')));document.querySelectorAll('.my-tab-content').forEach(c=>c.classList.remove('active'));document.getElementById('my-tab-'+tab).classList.add('active');if(tab==='bookshelf')renderMyBookshelf();if(tab==='bookmarks')renderMyBookmarks();if(tab==='uploads')renderMyUploads();if(tab==='settings')renderMySettings();}
+function renderMyBookshelf(){const s=getBookshelfData();const books=getAllNovels().filter(b=>s.includes(b.id));document.getElementById('my-bookshelf-empty').style.display=books.length===0?'block':'none';let h='';books.forEach(b=>{h+=renderBookCard(b);});document.getElementById('my-bookshelf-grid').innerHTML=h;}
+function renderMyBookmarks(){const bms=Object.values(App.bookmarks);document.getElementById('my-bookmarks-empty').style.display=bms.length===0?'block':'none';if(bms.length===0){document.getElementById('my-bookmark-list').innerHTML='';return;}bms.sort((a,b)=>new Date(b.time)-new Date(a.time));let h='';bms.forEach(b=>{h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--divider)"><div style="cursor:pointer" onclick="openReader(\''+b.bookId+'\','+b.chapterIdx+')">📑 '+escapeHtml(b.bookTitle)+' — '+escapeHtml(b.chapterTitle)+'<br><span style="font-size:10px;color:var(--text2)">'+b.time+'</span></div><button style="background:none;border:none;color:#c0392b;cursor:pointer;font-size:14px" onclick="deleteBookmark(\''+getBmKey(b.bookId,b.chapterIdx)+'\')">✕</button></div>';});document.getElementById('my-bookmark-list').innerHTML=h;}
+function renderMyUploads(){const up=getUploadedNovels().filter(n=>n.uploadedBy===App.user.username);document.getElementById('my-uploads-empty').style.display=up.length===0?'block':'none';let h='';up.forEach(b=>{const avg=getAvgRating(b.id);const grad=b.cover||COVER_GRADIENTS[b.category];h+='<div style="position:relative"><div class="book-card" onclick="openReader(\''+b.id+'\',0)" style="min-width:auto;max-width:none"><div class="card-cover" style="background:'+grad+';height:160px"><span class="cover-emoji" style="font-size:28px">'+(b.emoji||COVER_EMOJI[b.category])+'</span></div><div class="card-info"><h4>'+escapeHtml(b.title)+'</h4><div class="card-author">'+b.chapters.length+'章'+(avg>0?' · ⭐'+avg.toFixed(1):'')+'</div></div></div><div style="position:absolute;top:4px;right:4px;display:flex;gap:3px"><button class="nav-btn" style="font-size:10px;padding:2px 6px;background:#3498db;color:#fff;border:none" onclick="event.stopPropagation();editNovel(\''+b.id+'\')">✎</button><button class="nav-btn" style="font-size:10px;padding:2px 6px;background:#c0392b;color:#fff;border:none" onclick="event.stopPropagation();deleteNovel(\''+b.id+'\')">✕</button></div></div>';});document.getElementById('my-uploads-grid').innerHTML=h;}
+function renderMySettings(){document.getElementById('my-settings-ui').innerHTML='<div style="max-width:400px"><div class="form-group" style="display:flex;justify-content:space-between;align-items:center"><label>字体大小</label><div id="fs-opts" style="display:flex;gap:4px"></div></div><div class="form-group" style="display:flex;justify-content:space-between;align-items:center"><label>主题</label><div id="th-opts" style="display:flex;gap:4px"></div></div><div class="form-group" style="display:flex;justify-content:space-between;align-items:center"><label>行间距</label><div id="lh-opts" style="display:flex;gap:4px"></div></div><div class="form-group" style="display:flex;justify-content:space-between;align-items:center"><label>字体</label><div id="ff-opts" style="display:flex;gap:4px"></div></div></div>';renderSettingsInMyPage();}
 
 // ==================== Reader ====================
-function openReader(bookId,chapterIdx){
-  const allNovels=getAllNovels();const book=allNovels.find(n=>n.id===bookId);
-  if(!book)return;
-  App.currentBookId=bookId;App.currentChapterIdx=chapterIdx;
-  document.getElementById('bookshelf').classList.add('hidden');
-  document.getElementById('reader').classList.add('active');
-  document.getElementById('float-toolbar').style.display='flex';
-  document.getElementById('btn-toc').style.display='';
-  document.getElementById('btn-bm').style.display='';
-  renderChapterList(book);renderChapterContent(book,chapterIdx);
-  renderBookmarksMini();renderComments(bookId);renderRating(bookId);renderErrataPanel(bookId);
-  saveLastPosition();applyTheme();
-  document.getElementById('content-area').scrollTo(0,0);
-}
-
-function goBookshelf(){
-  document.getElementById('reader').classList.remove('active');
-  document.getElementById('bookshelf').classList.remove('hidden');
-  document.getElementById('float-toolbar').style.display='none';
-  document.getElementById('btn-toc').style.display='none';
-  document.getElementById('btn-bm').style.display='none';
-  App.currentBookId=null;renderBookshelf();
-}
-
-function renderChapterList(book){
-  document.getElementById('chapter-list').innerHTML=book.chapters.map((ch,i)=>
-    '<div class="chapter-item'+(i===App.currentChapterIdx?' current':'')+'" onclick="jumpToChapter('+i+')"><span class="ch-num">第'+(i+1)+'章</span>'+ch.title.replace(/第[一二三四五六七八九十\d]+章\s*/,'')+'</div>'
-  ).join('');
-}
-
-function jumpToChapter(idx){
-  const allNovels=getAllNovels();const book=allNovels.find(n=>n.id===App.currentBookId);
-  if(!book||idx<0||idx>=book.chapters.length)return;
-  App.currentChapterIdx=idx;renderChapterList(book);renderChapterContent(book,idx);
-  saveLastPosition();document.getElementById('content-area').scrollTo(0,0);
-  if(window.innerWidth<=768){App.sidebarCollapsed=true;updateSidebar();}
-}
-
+function openReader(bookId,chapterIdx){const b=getAllNovels().find(n=>n.id===bookId);if(!b)return;App.currentBookId=bookId;App.currentChapterIdx=chapterIdx;document.getElementById('homepage').style.display='none';document.getElementById('my-page').classList.remove('show');document.getElementById('reader').classList.add('active');document.getElementById('float-toolbar').style.display='flex';renderChapterList(b);renderChapterContent(b,chapterIdx);renderBookmarksMini();renderComments(bookId);renderRating(bookId);renderErrataPanel(bookId);saveLastPosition();applyTheme();document.getElementById('content-area').scrollTo(0,0);}
+function renderChapterList(book){document.getElementById('chapter-list').innerHTML=book.chapters.map((ch,i)=>'<div class="chapter-item'+(i===App.currentChapterIdx?' current':'')+'" onclick="jumpToChapter('+i+')">'+ch.title+'</div>').join('');}
+function jumpToChapter(idx){const b=getAllNovels().find(n=>n.id===App.currentBookId);if(!b||idx<0||idx>=b.chapters.length)return;App.currentChapterIdx=idx;renderChapterList(b);renderChapterContent(b,idx);saveLastPosition();document.getElementById('content-area').scrollTo(0,0);if(window.innerWidth<=768){App.sidebarCollapsed=true;updateSidebar();}}
 function prevChapter(){jumpToChapter(App.currentChapterIdx-1);}
 function nextChapter(){jumpToChapter(App.currentChapterIdx+1);}
-
-function renderChapterContent(book,chapterIdx){
-  const ch=book.chapters[chapterIdx];
-  document.getElementById('curr-book-title').textContent=book.title;
-  document.getElementById('curr-chap-title').textContent=ch.title;
-  document.getElementById('btn-prev').disabled=chapterIdx===0;
-  document.getElementById('btn-next').disabled=chapterIdx===book.chapters.length-1;
-  const hasBm=!!App.bookmarks[getBmKey(book.id,chapterIdx)];
-  document.getElementById('btn-bookmark').textContent=hasBm?'🔖 已添加书签':'🔖 添加书签';
-  const fav=isOnBookshelf(book.id);
-  document.getElementById('btn-fav').textContent=fav?'❤️ 已收藏':'🤍 收藏';
-  document.getElementById('content-body').innerHTML='<h1 class="chapter-heading">'+ch.title+'</h1><div class="chapter-text">'+ch.content.map(p=>'<p>'+p+'</p>').join('')+'</div>';
-}
-
+function renderChapterContent(book,chapterIdx){const ch=book.chapters[chapterIdx];document.getElementById('curr-book-title').textContent=book.title;document.getElementById('curr-chap-title').textContent=ch.title;document.getElementById('btn-prev').disabled=chapterIdx===0;document.getElementById('btn-next').disabled=chapterIdx===book.chapters.length-1;const hasBm=!!App.bookmarks[getBmKey(book.id,chapterIdx)];document.getElementById('btn-bookmark').textContent=hasBm?'🔖 已加书签':'🔖 书签';const fav=isOnBookshelf(book.id);document.getElementById('btn-fav').textContent=fav?'❤️ 已收藏':'🤍 收藏';document.getElementById('content-body').innerHTML='<h1 class="chapter-heading">'+ch.title+'</h1><div class="chapter-text">'+ch.content.map(p=>'<p>'+p+'</p>').join('')+'</div>';}
 function toggleSidebar(){App.sidebarCollapsed=!App.sidebarCollapsed;updateSidebar();}
 function updateSidebar(){document.getElementById('sidebar').classList.toggle('collapsed',App.sidebarCollapsed);}
+function renderBookmarksMini(){const bms=Object.values(App.bookmarks).filter(b=>b.bookId===App.currentBookId);document.getElementById('bookmarks-mini').innerHTML=bms.length===0?'':bms.map(b=>'<div style="font-size:11px;color:var(--accent);cursor:pointer;padding:4px 0" onclick="jumpToChapter('+b.chapterIdx+')">📑 '+escapeHtml(b.chapterTitle)+'</div>').join('');}
 
-function renderBookmarksMini(){
-  const bms=Object.values(App.bookmarks).filter(b=>b.bookId===App.currentBookId);
-  document.getElementById('bookmarks-mini').innerHTML=bms.length===0
-    ?'<h4>本书书签</h4><p style="font-size:11px;color:var(--text2)">暂无书签</p>'
-    :'<h4>本书书签</h4>'+bms.map(b=>'<div class="bm-mini-item" onclick="jumpToChapter('+b.chapterIdx+')">📑 '+b.chapterTitle+'</div>').join('');
-}
+function renderComments(bookId){const cs=getComments(bookId);let h='<div class="comments-header">💬 评论 ('+cs.length+')</div>';if(App.user)h+='<div class="comment-form"><textarea id="comment-input" placeholder="写下你的评论..."></textarea><button class="comment-submit" onclick="postComment()">发表</button></div>';else h+='<p style="font-size:12px;color:var(--text2);margin-bottom:12px">请<a style="color:var(--accent);cursor:pointer;text-decoration:underline" onclick="showAuthModal(\'login\')">登录</a>后发表评论</p>';if(cs.length===0)h+='<p style="color:var(--text2);font-size:13px;text-align:center;padding:10px 0">暂无评论</p>';else{cs.forEach(c=>{const d=new Date(c.createdAt);const ts=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');h+='<div class="comment-item"><div class="comment-user">'+escapeHtml(c.username)+'</div><div class="comment-text">'+escapeHtml(c.text)+'</div><div class="comment-time">'+ts+'</div></div>';});}document.getElementById('comments-section').innerHTML=h;}
 
-function showBookmarks(){renderBookmarkPanel();document.getElementById('bookmark-panel').classList.add('show');document.getElementById('modal-overlay').classList.add('show');}
-function renderBookmarkPanel(){
-  const bms=Object.values(App.bookmarks);
-  if(bms.length===0){document.getElementById('bookmark-list').innerHTML='<p style="color:var(--text2);font-size:13px;text-align:center">暂无书签</p>';return;}
-  bms.sort((a,b)=>new Date(b.time)-new Date(a.time));
-  document.getElementById('bookmark-list').innerHTML=bms.map(b=>'<div class="bm-item" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--divider)"><div style="flex:1;cursor:pointer" onclick="jumpToBookmark(\''+b.bookId+'\','+b.chapterIdx+')"><div style="font-size:13px;color:var(--text)">📑 '+b.bookTitle+' — '+b.chapterTitle+'</div><div style="font-size:10px;color:var(--text2)">'+b.time+'</div></div><button style="background:none;border:none;color:#c0392b;cursor:pointer;font-size:16px;padding:4px" onclick="event.stopPropagation();deleteBookmark(\''+getBmKey(b.bookId,b.chapterIdx)+'\')">✕</button></div>').join('');
-}
-function jumpToBookmark(bookId,chapterIdx){closeAllModals();if(App.currentBookId!==bookId)openReader(bookId,chapterIdx);else jumpToChapter(chapterIdx);}
-function deleteBookmark(key){delete App.bookmarks[key];saveBookmarks();renderBookmarkPanel();renderBookmarksMini();if(App.currentBookId)renderChapterContent(getAllNovels().find(n=>n.id===App.currentBookId),App.currentChapterIdx);}
+function renderRating(bookId){const avg=getAvgRating(bookId);const cnt=getRatingCount(bookId);const my= getUserRating(bookId);let h='<div class="rating-header">⭐ 评分</div><div class="rating-current" style="font-size:13px;color:var(--text2);margin-bottom:8px">综合：<b style="color:var(--star);font-size:18px">'+(avg>0?avg.toFixed(1):'暂无')+'</b>/10（'+cnt+'人）';if(my)h+=' · 你评：<b style="color:var(--accent)">'+my+'</b>';h+='</div>';if(App.user){h+='<div class="rating-stars">';for(let i=1;i<=10;i++)h+='<button class="rating-star'+(my===i?' my-score':'')+'" onclick="submitRating(\''+bookId+'\','+i+')">'+i+'</button>';h+='</div>';}else h+='<p style="font-size:12px;color:var(--text2)">请<a style="color:var(--accent);cursor:pointer;text-decoration:underline" onclick="showAuthModal(\'login\')">登录</a>后评分</p>';document.getElementById('rating-section').innerHTML=h;}
+
+function renderErrataPanel(bookId){const b=getAllNovels().find(n=>n.id===bookId);if(!b){document.getElementById('errata-section').innerHTML='';return;}const er=getErrata(bookId);const isAuthor=b.isUploaded&&App.user&&App.user.username===b.uploadedBy;const openC=er.filter(e=>e.status==='open').length;let h='<div class="errata-header"><span>📝 纠错反馈'+(openC>0?' <span style="color:#e74c3c;font-size:12px">('+openC+'条未处理)</span>':'')+'</span><button class="nav-btn" onclick="showErrataForm()">+ 提交纠错</button></div>';if(er.length===0)h+='<p style="color:var(--text2);font-size:12px;text-align:center;padding:10px 0">暂无纠错</p>';else{er.forEach(e=>{const d=new Date(e.createdAt);const ts=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');h+='<div class="errata-item"><div class="errata-meta">'+escapeHtml(e.username)+' · '+escapeHtml(e.chapterTitle)+' · '+ts+' <span class="errata-status '+e.status+'">'+(e.status==='open'?'待处理':'已修复')+'</span></div><div class="errata-desc">'+escapeHtml(e.description)+'</div>';if(e.suggestion)h+='<div class="errata-suggestion">💡 '+escapeHtml(e.suggestion)+'</div>';if(isAuthor)h+='<div style="margin-top:6px;display:flex;gap:6px"><button class="nav-btn" style="font-size:10px;padding:2px 8px" onclick="markErrataFixed(\''+bookId+'\',\''+e.id+'\',event)">'+(e.status==='open'?'✓ 标记已修复':'↩ 重新打开')+'</button><button class="nav-btn" style="font-size:10px;padding:2px 8px;color:#c0392b" onclick="deleteErrata(\''+bookId+'\',\''+e.id+'\',event)">删除</button></div>';h+='</div>';});}document.getElementById('errata-section').innerHTML=h;}
 
 // ==================== Settings ====================
 function loadSettings(){try{const s=JSON.parse(localStorage.getItem('novel_settings'));if(s)App.settings={...App.settings,...s};}catch(e){}}
 function saveSettings(){localStorage.setItem('novel_settings',JSON.stringify(App.settings));}
-function applyTheme(){
-  document.documentElement.setAttribute('data-theme',App.settings.theme);
-  const ca=document.getElementById('content-area');if(ca){ca.style.setProperty('--font-size',App.settings.fontSize+'px');ca.style.setProperty('--line-height',App.settings.lineHeight);}
-  const fm={song:"'STSong','Songti SC','SimSun',serif",hei:"'PingFang SC','Microsoft YaHei','SimHei',sans-serif",kai:"'KaiTi','STKaiti','楷体',serif"};
-  document.body.style.fontFamily=fm[App.settings.fontFamily]||fm.song;
-}
+function applyTheme(){document.documentElement.setAttribute('data-theme',App.settings.theme);const ca=document.getElementById('content-area');if(ca){ca.style.setProperty('--font-size',App.settings.fontSize+'px');ca.style.setProperty('--line-height',App.settings.lineHeight);}const fm={song:"'STSong','Songti SC','SimSun',serif",hei:"'PingFang SC','Microsoft YaHei','SimHei',sans-serif",kai:"'KaiTi','STKaiti','楷体',serif"};document.body.style.fontFamily=fm[App.settings.fontFamily]||fm.song;}
+function showSettings(){closeAllModals();document.getElementById('modal-overlay').classList.add('show');document.getElementById('settings-panel').classList.add('show');renderSettingsUI();}
+function renderSettingsUI(){renderSettingsOptions('font-size-opts',[{v:15,l:'小'},{v:17,l:'中'},{v:20,l:'大'},{v:24,l:'超大'}],App.settings.fontSize);renderSettingsOptions('theme-opts',[{v:'light',l:'白天'},{v:'dark',l:'夜间'},{v:'eye',l:'护眼'}],App.settings.theme);renderSettingsOptions('line-height-opts',[{v:1.6,l:'紧凑'},{v:2.0,l:'标准'},{v:2.4,l:'宽松'}],App.settings.lineHeight);renderSettingsOptions('font-family-opts',[{v:'song',l:'宋体'},{v:'hei',l:'黑体'},{v:'kai',l:'楷体'}],App.settings.fontFamily);}
+function renderSettingsInMyPage(){renderSettingsOptions('fs-opts',[{v:15,l:'小'},{v:17,l:'中'},{v:20,l:'大'},{v:24,l:'超大'}],App.settings.fontSize);renderSettingsOptions('th-opts',[{v:'light',l:'白天'},{v:'dark',l:'夜间'},{v:'eye',l:'护眼'}],App.settings.theme);renderSettingsOptions('lh-opts',[{v:1.6,l:'紧凑'},{v:2.0,l:'标准'},{v:2.4,l:'宽松'}],App.settings.lineHeight);renderSettingsOptions('ff-opts',[{v:'song',l:'宋体'},{v:'hei',l:'黑体'},{v:'kai',l:'楷体'}],App.settings.fontFamily);}
+function renderSettingsOptions(elId,opts,cur){const el=document.getElementById(elId);if(!el)return;el.innerHTML=opts.map(o=>'<button class="setting-opt'+(o.v===cur?' selected':'')+'" data-val="'+o.v+'" data-grp="'+elId+'">'+o.l+'</button>').join('');}
+document.addEventListener('click',function(e){if(e.target.classList.contains('setting-opt')){const v=e.target.dataset.val;const g=e.target.dataset.grp;if(g==='font-size-opts'||g==='fs-opts')App.settings.fontSize=parseInt(v);else if(g==='theme-opts'||g==='th-opts')App.settings.theme=v;else if(g==='line-height-opts'||g==='lh-opts')App.settings.lineHeight=parseFloat(v);else if(g==='font-family-opts'||g==='ff-opts')App.settings.fontFamily=v;saveSettings();applyTheme();if(g.startsWith('f'))renderSettingsInMyPage();else renderSettingsUI();}});
 
-function showSettings(){
-  closeAllModals();document.getElementById('modal-overlay').classList.add('show');
-  document.getElementById('settings-panel').classList.add('show');renderSettingsUI();
-}
-function renderSettingsUI(){
-  const opts=[
-    {id:'font-size-opts',vals:[{v:15,l:'小'},{v:17,l:'中'},{v:20,l:'大'},{v:24,l:'超大'}],cur:App.settings.fontSize},
-    {id:'theme-opts',vals:[{v:'light',l:'白天'},{v:'dark',l:'夜间'},{v:'eye',l:'护眼'}],cur:App.settings.theme},
-    {id:'line-height-opts',vals:[{v:1.6,l:'紧凑'},{v:2.0,l:'标准'},{v:2.4,l:'宽松'}],cur:App.settings.lineHeight},
-    {id:'font-family-opts',vals:[{v:'song',l:'宋体'},{v:'hei',l:'黑体'},{v:'kai',l:'楷体'}],cur:App.settings.fontFamily},
-  ];
-  opts.forEach(o=>{document.getElementById(o.id).innerHTML=o.vals.map(v=>'<button class="setting-opt'+(v.v===o.cur?' selected':'')+'" data-val="'+v.v+'">'+v.l+'</button>').join('');});
-}
-
-document.addEventListener('click',function(e){
-  if(e.target.classList.contains('setting-opt')&&e.target.closest('#settings-panel')){
-    const opt=e.target;const parent=opt.parentElement;
-    parent.querySelectorAll('.setting-opt').forEach(b=>b.classList.remove('selected'));
-    opt.classList.add('selected');const val=opt.dataset.val;
-    if(parent.id==='font-size-opts')App.settings.fontSize=parseInt(val);
-    else if(parent.id==='theme-opts')App.settings.theme=val;
-    else if(parent.id==='line-height-opts')App.settings.lineHeight=parseFloat(val);
-    else if(parent.id==='font-family-opts')App.settings.fontFamily=val;
-    saveSettings();applyTheme();
-  }
-});
-
-function closeAllModals(){
-  document.getElementById('modal-overlay').classList.remove('show');
-  ['modal-login','modal-register','settings-panel','bookmark-panel','modal-upload','modal-errata'].forEach(id=>document.getElementById(id).classList.remove('show'));
-}
+function closeAllModals(){document.getElementById('modal-overlay').classList.remove('show');['modal-login','modal-register','settings-panel','modal-upload','modal-errata'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('show');});}
 
 // ==================== Events ====================
-document.getElementById('content-area').addEventListener('scroll',function(){document.getElementById('back-top').style.display=this.scrollTop>400?'flex':'none';});
-document.addEventListener('keydown',e=>{
-  if(document.activeElement.tagName==='INPUT'||document.activeElement.tagName==='TEXTAREA')return;
-  if(!App.currentBookId)return;
-  if(e.key==='ArrowLeft')prevChapter();
-  if(e.key==='ArrowRight')nextChapter();
-  if(e.key==='Escape')closeAllModals();
-});
-
-// Auth enter key support
-['login-username','login-password','reg-username','reg-password','reg-password2'].forEach((id,i)=>{
-  document.getElementById(id).addEventListener('keydown',e=>{
-    if(e.key==='Enter'){
-      if(id==='login-username')document.getElementById('login-password').focus();
-      else if(id==='login-password')doLogin();
-      else if(id==='reg-username')document.getElementById('reg-password').focus();
-      else if(id==='reg-password')document.getElementById('reg-password2').focus();
-      else if(id==='reg-password2')doRegister();
-    }
-  });
-});
+document.addEventListener('keydown',e=>{if(document.activeElement.tagName==='INPUT'||document.activeElement.tagName==='TEXTAREA')return;if(e.key==='Escape'){if(App.currentBookId)goHome();else closeAllModals();}});
+['login-username','login-password','reg-username','reg-password','reg-password2'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter'){if(id==='login-username')document.getElementById('login-password').focus();else if(id==='login-password')doLogin();else if(id==='reg-username')document.getElementById('reg-password').focus();else if(id==='reg-password')document.getElementById('reg-password2').focus();else if(id==='reg-password2')doRegister();}});});
 
 // ==================== Init ====================
-function init(){
-  loadSettings();
-  const cu=getCurrentUser();
-  if(cu){App.user=cu;loadBookmarks();const pos=getLastPosition();if(pos){App.currentBookId=pos.bookId;App.currentChapterIdx=pos.chapterIdx;}}
-  else{App.user=null;loadBookmarks();const pos=getLastPosition();if(pos){App.currentBookId=pos.bookId;App.currentChapterIdx=pos.chapterIdx;}}
-  updateAuthUI();renderBookshelf();applyTheme();
-  if(App.currentBookId){openReader(App.currentBookId,App.currentChapterIdx);}
-}
+function init(){loadSettings();const cu=getCurrentUser();if(cu){App.user=cu;loadBookmarks();const pos=getLastPosition();if(pos){App.currentBookId=pos.bookId;App.currentChapterIdx=pos.chapterIdx;}}updateAuthUI();goHome();applyTheme();startBanner();if(App.currentBookId)openReader(App.currentBookId,App.currentChapterIdx);}
 init();
 </script>
 </body>
